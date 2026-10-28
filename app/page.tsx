@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import type { JSX } from "react";
 import { HeroSection } from "@/features/hero/hero-section";
 import { ParallaxScene } from "@/features/parallax/parallax-scene";
+import { ParallaxHud } from "@/features/parallax/parallax-hud";
 import { ProjectsShowcase } from "@/features/projects/projects-showcase";
 import { AboutSection } from "@/features/about/about-section";
 import { FaqSection } from "@/features/faq/faq-section";
@@ -33,6 +34,9 @@ export default function HomePage(): JSX.Element {
       />
       <HeroSection />
       <ParallaxScene />
+      {/* DEV-ONLY: live PIN % readout for scroll-timing instructions —
+       * dead-code eliminated from the production build by this guard. */}
+      {process.env.NODE_ENV === "development" ? <ParallaxHud /> : null}
       <ProjectsShowcase />
       <AboutSection />
       <FaqSection />

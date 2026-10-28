@@ -32,13 +32,8 @@ export const PAPER_SEAMS_ELEMENTS = {
     "starBig",
     "bigCircle",
   ],
-  midground: [
-    "mountains",
-    "mountainPerforation",
-    "mountainCrosses",
-    "mountainsFront",
-    "mountainFrontPerforation",
-  ],
+  midground: ["mountains", "mountainPerforation", "mountainCrosses"],
+  midgroundFront: ["mountainsFront", "mountainFrontPerforation"],
   foreground: [
     "sewingGround",
     "groundSeam",
@@ -58,7 +53,9 @@ const INK = "#04161d";
 const GROUND = "#021016";
 const MOUNT = "#08222c";
 const MOUNT_FRONT = "#061c26";
-const SKY = "#03141c";
+const SKY = "#04090c"; /* = --color-bg: matches the hero section's
+ * background so the scene's peek/roll-in never shows a color seam
+ * against the hero above it. */
 const RIM = "#7fb0bc";
 const PALE = "#cfe8ec";
 const GALAXY = "#3a5a64";
@@ -87,12 +84,34 @@ const STAR_FIELD: Array<{ x: number; y: number; r: number; o: number }> =
   (function buildStars(): Array<{ x: number; y: number; r: number; o: number }> {
     const rand = seededRandom(61);
     const stars: Array<{ x: number; y: number; r: number; o: number }> = [];
-    for (let i = 0; i < 110; i++) {
+    for (let i = 0; i < 200; i++) {
       stars.push({
         x: f1(rand() * 1440),
         y: f1(rand() * 420),
         r: f1(0.5 + rand() * 0.9),
         o: f1(0.25 + rand() * 0.3),
+      });
+    }
+    return stars;
+  })();
+
+/* DEEP STAR FIELD — second sprinkle spanning y 420–860, so the sky reaches
+ * DOWN BEHIND the mountain bands instead of stopping at the upper-sky
+ * sprinkle's floor. The bg layer (z-0) sits under mid/midfront, so these
+ * lower stars read as occluded by the ridges: they show in the roll-in
+ * sky and through the valley gap between the crests (distant crest at art
+ * ~y470, front band ~y590), then the mountains arrive over them. Same
+ * pale palette, slightly dimmer to stay a background whisper. */
+const DEEP_STAR_FIELD: Array<{ x: number; y: number; r: number; o: number }> =
+  (function buildDeepStars(): Array<{ x: number; y: number; r: number; o: number }> {
+    const rand = seededRandom(613);
+    const stars: Array<{ x: number; y: number; r: number; o: number }> = [];
+    for (let i = 0; i < 300; i++) {
+      stars.push({
+        x: f1(rand() * 1440),
+        y: f1(420 + rand() * 440),
+        r: f1(0.5 + rand() * 0.8),
+        o: f1(0.18 + rand() * 0.25),
       });
     }
     return stars;
@@ -145,12 +164,26 @@ export function BackgroundLayer(): JSX.Element {
       <g data-element="sky">
         <rect width="1440" height="1620" fill={SKY} />
       </g>
-      {/* stars — sprinkle of small stars over the upper sky (dropped 60) */}
+      {/* stars — sprinkle of small stars over the upper sky (dropped 60),
+       * plus the deep field (y 420–860) that runs down BEHIND the mountain
+       * bands — same group, rendered under mid/midfront by z-order */}
       <g data-element="stars" transform="translate(0 60)">
         {STAR_FIELD.map(function (star, index): JSX.Element {
           return (
             <circle
               key={index}
+              cx={star.x}
+              cy={star.y}
+              r={star.r}
+              fill={PALE}
+              opacity={star.o}
+            />
+          );
+        })}
+        {DEEP_STAR_FIELD.map(function (star, index): JSX.Element {
+          return (
+            <circle
+              key={`d${index}`}
               cx={star.x}
               cy={star.y}
               r={star.r}
@@ -242,7 +275,8 @@ export function BackgroundLayer(): JSX.Element {
   );
 }
 
-/** The mountain separator: two paper-cut bands with stitch perforations. */
+/** The mountain separator: distant paper-cut band with stitch perforations
+ * (the nearest band lives in MidgroundFrontLayer, its own parallax depth). */
 export function MidgroundLayer(): JSX.Element {
   return (
     <svg
@@ -288,6 +322,27 @@ export function MidgroundLayer(): JSX.Element {
         <path d={crossPath(975, 565, 6)} />
         <path d={crossPath(1255, 600, 6)} />
       </g>
+    </svg>
+  );
+}
+
+/**
+ * The mountain separator II: the NEARER, darker front band, its own
+ * parallax depth (px-layer-midfront) so it can rise at a different rate
+ * than the distant ridge — the closer band enters the fold later, lands
+ * after it, then departs farther than it does.
+ */
+export function MidgroundFrontLayer(): JSX.Element {
+  return (
+    <svg
+      viewBox="0 0 1440 1000"
+      preserveAspectRatio="xMidYMid slice"
+      className="h-full w-full"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+      focusable="false"
+      style={{ overflow: "visible" }}
+    >
       {/* mountainsFront — closer, darker second band in front */}
       <g data-element="mountainsFront">
         <path
@@ -327,11 +382,13 @@ export function ForegroundLayer(): JSX.Element {
           <stop offset="1" stopColor="#050d10" stopOpacity="1" />
         </linearGradient>
       </defs>
-      {/* sewingGround — darkest ground band of the sewing world */}
+      {/* sewingGround — darkest ground band of the sewing world (y810–1000),
+       * exactly the reference composition (vyn-parallax-elements.html) */}
       <g data-element="sewingGround">
         <rect x="0" y="810" width="1440" height="190" fill={GROUND} />
       </g>
-      {/* groundSeam — dashed seam along the top edge of the ground */}
+      {/* groundSeam — dashed seam line marking the top edge of the sewing
+       * ground (y810) — the feet of the sewing elements stand on it */}
       <g data-element="groundSeam">
         <line
           x1="0"
@@ -438,7 +495,10 @@ export function ForegroundLayer(): JSX.Element {
       </g>
       {/* ruler — tape-measure strip along the very bottom (y946–988):
        * rounded ends, hook loop left, ticks from the top edge, orange
-       * dashed datum line */}
+       * dashed datum line — carried by THIS sheet: it moves together with
+       * the ground layer (reference: vyn-parallax-elements.html). Its
+       * strip sits below the 100svh fold at native transform, which the
+       * fg layer's −6% rest raises into the visible bottom edge. */}
       <g data-element="ruler">
         <rect x="10" y="946" width="1420" height="42" rx="19" fill={INK} stroke={RIM} strokeWidth="1.8" />
         <circle cx="30" cy="967" r="7" fill="none" stroke={RIM} strokeWidth="3" />
