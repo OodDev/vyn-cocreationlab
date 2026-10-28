@@ -17,45 +17,61 @@ import { BackgroundLayer, ForegroundLayer, MidgroundFrontLayer, MidgroundLayer }
  * prefers reduced motion, the scene renders statically (see the px-* rules
  * in globals.css).
  *
- * Timeline math (uses the 230svh wrapper, pushed down by a fixed 100px
+ * Timeline math (uses the 360svh wrapper, pushed down by a fixed 100px
  * static gap under the hero — the GAP is BEFORE the wrapper, so the cover
- * math below is unchanged in PIN %): the `view()` cover phase spans
- * wrapper+viewport = 330svh of scroll. The pinned phase — wrapper top at
- * viewport top (framer's "start start") — starts at 100/330 ≈ 30.3% and ends
- * when the wrapper bottom meets the viewport bottom (framer's "end end") at
- * 230/330 ≈ 69.7%. Most px-* RANGES START BELOW 30.3% — inside the roll-in —
- * so the assembly overlaps the sky's appearance (negative pin = pre-lock:
- * PIN −77 = scene peek, PIN 0 = the lock).
+ * math below changes scale but every PIN % beat keeps its absolute scroll
+ * position): the `view()` cover phase spans wrapper+viewport = 460svh of
+ * scroll (1 cover % = 4.6svh). The pinned phase — wrapper top at viewport
+ * top (framer's "start start") — starts at 100/460 ≈ 21.7% and ends when
+ * the wrapper bottom meets the viewport bottom (framer's "end end") at
+ * 360/460 ≈ 78.3%. Most px-* RANGES START BELOW 21.7% — inside the
+ * roll-in — so the assembly overlaps the sky's appearance (negative pin =
+ * pre-lock: PIN −38 = scene peek, PIN 0 = the lock). ONE pin unit is now
+ * 2.6svh of scroll (the pre-extension pin was 1.3), so every historical
+ * PIN beat HALved on the HUD; the beats below are the post-extension
+ * numbers.
  *
- * Overlapping assembly (full map in the px-* block in globals.css): the
- * scene assembles WHILE the sky is appearing, not after the sky is loaded —
- * at the lock the frame is already a stacked, mid-arrival world. Timing
- * sheet ("start" = the band's crest crosses the fold, "lands" = rest):
- * distant ridge starts PIN −34 / lands 30 · front band — pushed LATER and
- * more detached from the first ridge — starts PIN −14 / lands 40 · sewing
- * world — exactly the reference composition (vyn-parallax-elements.html):
- * seam and sewing feet at 810 units = 84.7svh, tape-measure ruler
- * ATTACHED to the sheet — starts PIN −12 (needle tip first; the ground
- * seam tops the fold ~PIN 1) and lands at a −6% REST at 100: the seam
- * settles at 78.7svh and the ruler strip (moving with the same
- * transform) tops the fold ~PIN 11 and rests at 94–98.7svh, the bottom
- * datum above the projects contact line — the closer planes cover the
- * farther as they pass;
- * the planet setting behind the crest and the drafting circle losing its
- * lower half to the arriving ridges happen en route. The orange thread
- * draws spool→needle eye at pin 37→75, then drops eye→ground at pin
- * 55→96, finishing just before release. Statement: line 1 is RAISED
- * (bottom-56svh, zone ≈39–44svh) and fades in during the roll (pin
- * −49→−20, cover 12→22.4), staying long readable before the first ridge's
- * departure sweep (~pin 36+) covers it; line 2 (ink-white, z-40) in
- * cover 57→66 above the landed world.
- * Departure: bg −16% (drifting from the scene peek) while mid −34% and
- * midfront −45% out-travel after their landings, each depth ahead of the
- * one behind, while the sewing world holds at its −6% rest (ruler strip
- * as the bottom datum) to the release —
- * the projects section covers it at full stretch, its blend gradient
- * landing exactly at the contact line. Artwork: "Paper Seams"
- * (layer-art.tsx).
+ * SIX-PHASE STRUCTURE (full map in the px-* block in globals.css):
+ *
+ * · PHASE 1 · SCENE PEEK (PIN −38 → −24): the sky whispers in — the empty
+ *   #04090c sky, deep star field, moon, galaxy and the planet slide up on
+ *   their full-roll drift; nothing else is in frame yet.
+ * · PHASE 2 · ROLL-IN (PIN −24 → −5): the distant ridge crests the fold
+ *   at PIN −17, the front band at −6, the sewing world (needle tip) at
+ *   −5 — away from an empty sky, every band is mid-arrival at the lock.
+ *   LINE 1 fades slowly through this stretch (−23 → −10).
+ * · PHASE 3 · ASSEMBLY (PIN −5 → 15/20/50): the closer planes overtake
+ *   the farther as they rise: the ridge lands 15, the front band 20, and
+ *   the sewing world — exactly the reference composition
+ *   (vyn-parallax-elements.html): seam and sewing feet at 810 units =
+ *   84.7svh, tape-measure ruler ATTACHED to the sheet — LAST, at −6%
+ *   REST at PIN 50 (the seam tops the fold ~PIN 0–1 and settles 78.7svh;
+ *   the ruler tops the fold ~PIN 5 and rests 94–98.7svh). The planet
+ *   sits behind the crest and the drafting circle loses its lower half
+ *   en route. Departure sweeps begin as each band lands: the ridge leaves
+ *   to −34%, the front band out-travels it to −45% (their departure
+ *   completes by PIN 50), burying LINE 1 (sweep ~PIN 18→22).
+ * · PHASE 4 · STATEMENT (PIN 50 → 60, inside the hold's opening stretch):
+ *   LINE 2 (ink-white, z-40) fades in — no positional motion, one fixed
+ *   viewport position — no thread yet, that's the point.
+ * · PHASE 5 · HOLD — THE STILL FRAME + THREAD (PIN 50 → 92): ALL
+ *   motion stops; the completed world sits motionless. As the scroll
+ *   continues, the orange thread (absent until now!) draws spool →
+ *   needle eye at PIN 50→75, then falls out of the eye and curls to the
+ *   ground at PIN 75→88 — completing BEFORE the launch — and the world
+ *   holds one quiet beat of scrolling (PIN 88→92).
+ * · PHASE 6 · LAUNCH (PIN 92 → 100): the needle+flames rocket — parked
+ *   on the seam through six phases — tips at its base and ARCS
+ *   diagonally up-left through the screen centre while zooming to 40×
+ *   (the "D · Arc into centre" variant of rocket-takeoff-variants.html,
+ *   adapted): the zoom sweeps it completely off-screen — no fade — by
+ *   the release.
+ * · PHASE 7 · RELEASE (PIN 100 +): the frame exits upward: bg holds its
+ *   −16% drift, mid −34%, midfront −45% already parked — the sewing
+ *   world holds at its −6% rest (the rocket already departed;
+ *   ruler strip as the bottom datum) while
+ *   the projects section scrolls in below, its blend gradient landing
+ *   exactly at the contact line. Artwork: "Paper Seams" (layer-art.tsx).
  *
  * Each layer's inner box is overscanned -6% vertically: the 1440×1000 canvas
  * is taller than the viewport, so slice-fitting into a slightly taller box
@@ -68,7 +84,7 @@ export function ParallaxScene(): JSX.Element {
     <section
       aria-labelledby="parallax-caption"
       data-section="projects-intro"
-      className="px-scene relative mt-[100px] h-[230svh]"
+      className="px-scene relative mt-[100px] h-[360svh]"
     >
       <div className="px-sticky sticky top-0 h-[100svh] overflow-hidden">
         <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
@@ -94,15 +110,17 @@ export function ParallaxScene(): JSX.Element {
           </div>
         </div>
         {/* Act-4 statement, SPLIT BY DEPTH. Line 1 is a buried layer, RAISED
-         * (bottom-56svh → it rides the sky band above every crest, zone
-         * (bottom-56svh + 120px → it rides the sky band above every crest, zone
-         * ≈39–44svh content vs the distant-ridge crest landing at 46.6):
-         * it fades in slowly through the roll (pin −49→−20) — long readable BEFORE
-         * any silhouette can reach it — then STAYS until the first ridge's
-         * departure sweep (~pin 36+) swallows it; no fade-out animation
-         * ever runs. Line 2 (ink-white, former accent line) is z-40,
-         * above every layer, rising over the landed world as the thread
-         * completes. Two separate stacking containers are what let the
+         * (bottom calc 56svh + 120px → it rides the sky band above every
+         * crest, zone ≈39–44svh content vs the distant-ridge crest landing
+         * at 46.6): it fades in slowly through the roll (pin −23→−10) — long
+         * readable BEFORE any silhouette can reach it — then STAYS until the
+         * first ridge's departure sweep (~pin 18+) swallows it; no fade-out
+         * animation ever runs. Line 2 (ink-white, former accent line) is
+         * z-40, above every layer, fading in — SCROLLING NEVER MOVES IT:
+         * it holds one fixed viewport position (opacity-only, no rise) —
+         * over the landed, still world at pin 50→60 — just before the
+         * thread, which only exists later in the hold phase. Two separate
+         * stacking containers are what let the
          * lines sit on OPPOSITE sides of the layers (one buried, one on
          * top). Without scroll-timeline support (or with reduced motion)
          * both render fully visible, stacked (see the px-statement-2

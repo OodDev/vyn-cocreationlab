@@ -46,6 +46,11 @@ export const PAPER_SEAMS_ELEMENTS = {
     "buttonOrange",
     "ruler",
   ],
+  /* The launch element (PHASE 6): one steerable group carrying the
+   * needle-mast and its flames — parked on the seam until the hold ends,
+   * then arcing diagonally to the screen centre and FILLING the viewport
+   * at release. Choreographed by .px-rocket in globals.css. */
+  rocket: ["rocket", "needle", "needleFlames"],
 } as const;
 
 /* palette (cut-paper discipline: dark silhouettes, pale rim, one orange) */
@@ -402,8 +407,10 @@ export function ForegroundLayer(): JSX.Element {
       </g>
       {/* threadRise — thin orange thread from the spool up to the needle's
        * eye; drawn left→right by .px-thread (stroke-dashoffset, see
-       * globals.css). pathLength=100 lets one dasharray/offset pair control
-       * the whole draw. */}
+       * globals.css). Sitting HIDDEN (offset 100) through the whole
+       * assembly, it only draws in the PHASE 5 hold (pin 50→75).
+       * pathLength=100 lets one dasharray/offset pair control the whole
+       * draw. */}
       <g data-element="threadRise">
         <path
           className="px-thread"
@@ -417,7 +424,8 @@ export function ForegroundLayer(): JSX.Element {
         />
       </g>
       {/* threadFall — the thread continuing out of the eye, falling right
-       * and curling on the ground (drawn slightly after the rise) */}
+       * and curling on the ground (drawn after the rise in the PHASE 5
+       * hold, pin 75→95) */}
       <g data-element="threadFall">
         <path
           className="px-thread-tail"
@@ -452,35 +460,42 @@ export function ForegroundLayer(): JSX.Element {
         <circle cx="-71.4" cy="-16" r="17" fill={INK} stroke={RIM} strokeWidth="1.6" />
         <circle cx="-71.4" cy="30" r="17" fill={INK} stroke={RIM} strokeWidth="1.6" />
       </g>
-      {/* needle — upright mast needle standing ON the seam at (1280,810),
-       * tiny eye at (1280,660): reads as a rocket about to lift off */}
-      <g data-element="needle" transform="translate(1280 810) scale(0.64)">
-        <path
-          d="M 6 0 L 2 -240 L 0 -254 L -3 -240 L -6 0 Z"
-          fill={INK}
-          stroke={RIM}
-          strokeWidth="1.8"
-        />
-        <ellipse
-          cx="0"
-          cy="-234"
-          rx="2.2"
-          ry="3.4"
-          fill="none"
-          stroke={RIM}
-          strokeWidth="1.6"
-        />
-      </g>
-      {/* needleFlames — launch flames below the mast base (m1 nested plume:
-       * F1 silhouette + two stacked inner plumes), 10% smaller */}
-      <g data-element="needleFlames" transform="translate(1280 810) scale(0.9)">
-        <Flickers fill={ORANGE} />
-        <Plume fill={ORANGE} />
-        <g transform="scale(0.72)">
-          <Plume fill={ORANGE_DEEP} />
+      {/* rocket — the LAUNCH element (PHASE 6): the needle-mast and its
+       * launch flames wrapped in one steerable group; it stands parked on
+       * the seam until the hold nears its end, then ± rotates/tips at its
+       * base, accelerates diagonally (up-left) and scales to FILL the
+       * screen at the release. Choreographed by .px-rocket (globals.css). */}
+      <g data-element="rocket" className="px-rocket">
+        {/* needle — upright mast needle standing ON the seam at (1280,810),
+         * tiny eye at (1280,660): reads as a rocket about to lift off */}
+        <g data-element="needle" transform="translate(1280 810) scale(0.64)">
+          <path
+            d="M 6 0 L 2 -240 L 0 -254 L -3 -240 L -6 0 Z"
+            fill={INK}
+            stroke={RIM}
+            strokeWidth="1.8"
+          />
+          <ellipse
+            cx="0"
+            cy="-234"
+            rx="2.2"
+            ry="3.4"
+            fill="none"
+            stroke={RIM}
+            strokeWidth="1.6"
+          />
         </g>
-        <g transform="scale(0.42)">
-          <Plume fill={ORANGE_MID} />
+        {/* needleFlames — launch flames below the mast base (m1 nested plume:
+         * F1 silhouette + two stacked inner plumes), 10% smaller */}
+        <g data-element="needleFlames" transform="translate(1280 810) scale(0.9)">
+          <Flickers fill={ORANGE} />
+          <Plume fill={ORANGE} />
+          <g transform="scale(0.72)">
+            <Plume fill={ORANGE_DEEP} />
+          </g>
+          <g transform="scale(0.42)">
+            <Plume fill={ORANGE_MID} />
+          </g>
         </g>
       </g>
       {/* buttonOrange — four-hole button, bottom left (79,879) */}

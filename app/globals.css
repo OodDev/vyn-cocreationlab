@@ -153,50 +153,68 @@ body {
 }
 
 /* ─── Parallax scene (CSS scroll-driven, zero JS) ───────────────────────
- * The wrapper is 230svh, so its view() cover phase spans 330svh of scroll.
- * The wrapper publishes a NAMED view timeline (--pxscene) and every px-*
- * animation references it — the layers live inside the sticky viewport, so
- * their own view() progress is frozen mid-pin (element never moves relative
- * to the viewport → timeline stuck at 50%). The named timeline tracks the
- * wrapper itself, whose rect does traverse the viewport while pinned.
- * The pinned segment (wrapper top at viewport top → wrapper bottom at
- * viewport bottom) is view-progress 30.3% → 69.7%. Pin 0 = the scene
- * locks, pin 100 = it releases, and NEGATIVE pin = the roll-in before
- * the lock (PIN −77 = the scene starts peeking; bridge: cover% = 30.3 +
- * pin% × 0.394). Most px-* ranges now START INSIDE THE ROLL so the whole
- * scene assembles WHILE the sky is appearing; layer transform % resolve
- * against the 100svh layer box.
+ * The wrapper is 360svh, so its view() cover phase spans 460svh of scroll
+ * (1 cover % = 4.6svh). The wrapper publishes a NAMED view timeline
+ * (--pxscene) and every px-* animation references it — the layers live
+ * inside the sticky viewport, so their own view() progress is frozen
+ * mid-pin (element never moves relative to the viewport → timeline stuck
+ * at 50%). The named timeline tracks the wrapper itself, whose rect does
+ * traverse the viewport while pinned. The pinned segment (wrapper top at
+ * viewport top → wrapper bottom at viewport bottom) is view-progress
+ * 21.7% → 78.3%. Pin 0 = the scene locks, pin 100 = it releases, and
+ * NEGATIVE pin = the roll-in before the lock (PIN −38 = the scene starts
+ * peeking; bridge: cover% = 21.7 + pin% × 0.25 on this 360svh wrapper).
+ * One pin % = 2.6svh of scroll — a pin-unit DOUBLING vs the previous
+ * 230svh geometry, so every historical PIN beat halved while keeping its
+ * absolute scroll position; the numbers below are the halved ones. Most
+ * px-* ranges START INSIDE THE ROLL so the whole scene assembles WHILE
+ * the sky is appearing; layer transform % resolve against the 100svh
+ * layer box.
  *
- * OVERLAPPING ASSEMBLY (multi-stop keyframes; arrivals staggered into the
- * roll-in — the pin no longer opens on an empty sky, every band is
- * mid-arrival at the lock). Timing sheet, "start" = the band's crest
- * crosses the viewport fold, "lands" = rest position: distant ridge
- * starts PIN −34 (cover 17) → lands 30 · the front band, pushed LATER
- * and more detached from the first ridge, starts PIN −14 (cover 25.8) →
- * lands 40 · the sewing world — exactly the reference composition
- * (vyn-parallax-elements.html): ground seam and sewing feet at 810 units
- * (84.7svh), the tape-measure ruler ATTACHED to this same sheet — rises
- * slowest, its top (needle tip) crossing the fold at PIN −12 (cover
- * 26); the ground seam itself tops the fold ~PIN 1, and the sheet lands
- * at a −6% REST exactly at the pin's end (100%): resting, the seam sits
- * at 78.7svh and the ruler strip (riding the same transform) tops the
- * fold ~PIN 11, resting at 94–98.7svh as the visible bottom datum above
- * the projects contact line. The planet is
- * swallowed by the crest and the giant drafting circle loses its lower
- * half to the arriving ridges en route. The orange thread draws
- * spool→needle eye at pin 37→75 and drops eye→ground at pin 55→96,
- * finishing just before the release. The statement: line 1 is RAISED
- * (bottom-56svh, riding the sky band above every crest) and fades in
- * during the roll (pin −49→−20, cover 12→22.4) — long readable before
- * anything can reach it — then STAYS, a buried layer (z-10) that only
- * the first ridge's departure sweep (~pin 36→45) swallows, never fading
- * out; line 2 (ink-white, z-40) in cover 57→66 (pin ≈68→91), above the
- * landed world. Departure — bg −16% (drifts from the scene peek:
- * full-roll range) while mid −34% and midfront −45% out-travel only
- * after their landings, each depth ahead of the one behind, as the
- * handoff approaches; the sewing world holds at its −6% rest to the
- * release, its ruler strip the bottom datum and its blend gradient
- * reaching the contact line.
+ * SIX PHASES (timing sheet; "start" = the band's crest crosses the
+ * viewport fold, "lands" = rest position):
+ *
+ * · P1 SCENE PEEK (−38 → −24): only the sky — bg drifts from the peek,
+ *   deep star field, moon, galaxy, planet.
+ * · P2 ROLL-IN (−24 → −5): distant ridge starts PIN −17 (cover 12.2) ·
+ *   front band, pushed LATER and more detached, starts PIN −6 (cover
+ *   18.5) · sewing world — exactly the reference composition
+ *   (vyn-parallax-elements.html): ground seam and sewing feet at 810
+ *   units (84.7svh), the tape-measure ruler ATTACHED to this same sheet —
+ *   starts PIN −5 (cover 18.7, needle tip first). Line 1 (RAISED, bottom
+ *   calc 56svh+120px, riding the sky band above every crest) fades
+ *   slowly in at pin −23→−10 (cover 8.6→16.1).
+ * · P3 ASSEMBLY (−5 → 50): the closer planes overtake the farther as
+ *   they pass — the ridge lands 15, the front band 20, the sewing world
+ *   LAST, at its −6% REST at PIN 50 (the ground seam itself tops the
+ *   fold ~PIN 0–1: resting, the seam sits at 78.7svh; the ruler strip
+ *   tops the fold ~PIN 5 and rests at 94–98.7svh, the visible bottom
+ *   datum above the projects contact line). The planet is swallowed by
+ *   the crest and the giant drafting circle loses its lower half to the
+ *   arriving ridges en route. Departure begins as each band lands: bg to
+ *   −16%, mid to −34%, midfront out-traveling to −45% — each depth ahead
+ *   of the one behind — the first ridge's departure sweep (~pin 18→22)
+ *   burying line 1 (z-10 buried layer; it is COVERED, never faded out).
+ *   Line 2 (ink-white, z-40) fades in at pin 50→60 (cover 53→57.6),
+ *   fully in at the hold's beginning, opacity-only (never moves). THE
+ *   THREAD IS ABSENT the whole way: the animation
+ *   finishes worldless-of-thread.
+ * · P4 HOLD — still frame + thread (PIN 50 → 92): every layer holds its
+ *   landed keyframe (fill both); the image stays STILL. As the scroll
+ *   continues, the orange thread appears — rise spool→needle eye pin
+ *   50→75 (cover 50→64.1), tail out of the eye, curling to the ground
+ *   pin 75→88 (cover 64.1→71.5 — done BEFORE the launch; the world then
+ *   holds a quiet beat, pin 88→92, as the scroll keeps going).
+ * · P5 LAUNCH (PIN 92 → 100): the needle+flames rocket — parked on the
+ *   seam all along — tips at its base and ARCS diagonally up-left through
+ *   the screen centre while zooming to 40× (variant D of
+ *   rocket-takeoff-variants.html): the zoom sweeps it fully past the
+ *   viewport corner — no fade — gone at the release.
+ * · P6 RELEASE (pin 100): the frame exits; the sewing world holds at its
+ *   −6% rest (the rocket already departed), ruler strip the
+ *   bottom datum, blend gradient reaching the contact line, as the
+ *   projects section scrolls over. Reduced motion
+ *   / no support: static scene below (rules follow).
  * Artwork: "Paper Seams" (see features/parallax/layer-art.tsx). */
 @supports (animation-timeline: view()) and (animation-range: normal normal) {
   @media (prefers-reduced-motion: no-preference) {
@@ -206,71 +224,100 @@ body {
       animation-timeline: --pxscene;
       animation-range: cover;
     }
-    /* Sky: full-roll range — the upward drift (to −16% at release) starts
-     * from the scene peek (cover 0, PIN −77), so the sky is already alive
-     * while the curtain rises. */
+    /* Sky: full-roll range — the upward drift (to −16% by PIN 50) starts
+     * from the scene peek (cover 0, PIN −38), so the sky is already alive
+     * while the curtain rises — then HOLDS through the whole still phase. */
     .px-layer-bg {
       animation: px-bg linear both;
       animation-timeline: --pxscene;
-      animation-range: cover 0% cover 69.7%;
+      animation-range: cover 0% cover 50%;
     }
     .px-layer-mid {
-      /* Distant ridge: crest crosses the fold at PIN −34 (cover 17) — the
-       * first arrival, during the roll-in — lands at native by PIN 30
-       * (stop 47.7% of this range), then departs −34%. */
+      /* Distant ridge: crest crosses the fold at PIN −17 (cover 12.2) — the
+       * first arrival, during the roll-in — lands at native by PIN 15
+       * (stop 47.7% of this range), then departs to −34% (sweep done by
+       * PIN 50) and HOLDS through the still phase. */
       animation: px-mid linear both;
       animation-timeline: --pxscene;
-      animation-range: cover 17% cover 69.7%;
+      animation-range: cover 12.2% cover 50%;
     }
     /* NEARER front mountain band: pushed LATER and more detached from the
      * first ridge. Starts deeper than the distant ridge and arrives once
-     * the ridge has basically landed (crest enters the fold at PIN −14,
-     * cover 25.8, vs the ridge's PIN −34). Lands still at 40% pin (stop
-     * 46.2% of this range), then out-travels the distant ridge by −45%. */
+     * the ridge has basically landed (crest enters the fold at PIN −6,
+     * cover 18.5, vs the ridge's PIN −17). Lands still at 20% pin (stop
+     * 46.2% of this range), then out-travels the distant ridge to −45%
+     * (done by PIN 50) and holds through the still phase. */
     .px-layer-midfront {
       animation: px-midfront linear both;
       animation-timeline: --pxscene;
-      animation-range: cover 25.8% cover 69.7%;
+      animation-range: cover 18.5% cover 50%;
     }
     .px-layer-fg {
       /* Sewing world (ruler attached): needle tip crosses the fold at
-       * PIN −12 (cover 26), the ground seam tops the fold ~PIN 1, and the
-       * sheet lands at its −6% REST exactly at the pin's end (100%) — the
-       * ruler strip rides the same transform. */
+       * PIN −5 (cover 18.7), the ground seam tops the fold ~PIN 0–1, and
+       * the sheet lands at its −6% REST at PIN 50 — the start of the hold
+       * phase. The ruler strip rides the same transform. */
       animation: px-fg linear both;
       animation-timeline: --pxscene;
-      animation-range: cover 26% cover 69.7%;
+      animation-range: cover 18.7% cover 50%;
     }
     .px-line1 {
-      /* Timing sheet: fades in DURING the roll (pin −49→−20, cover 12→22.4)
-       * — the SWEEP ITSELF is slower now: the same palette ramp spread
-       * over a much longer stretch of scroll, still finishing while the
-       * world is still deep in the roll-in — then it STAYS long before any
-       * silhouette can reach it and is merely COVERED later by the
-       * departing ridge's sweep (~pin 36→45; buried layer: z-10 puts it
-       * under mid/midfront/fg); no fade-out ever runs. */
+      /* Timing sheet: fades in DURING the roll (pin −23→−10, cover 8.6→16.1)
+       * — the SWEEP ITSELF is slow: the palette ramp spread over a long
+       * stretch of scroll, still finishing while the world is deep in the
+       * roll-in — then it STAYS long before any silhouette can reach it and
+       * is merely COVERED later by the departing ridge's sweep (~pin 18→22;
+       * buried layer: z-10 puts it under mid/midfront/fg); no fade-out ever
+       * runs. */
       animation: px-line1-in linear both;
       animation-timeline: --pxscene;
-      animation-range: cover 12% cover 22.4%;
+      animation-range: cover 8.6% cover 16.1%;
     }
     .px-line2 {
+      /* Statement over the STILL world: pin 50→60 (cover 53→57.6) —
+       * OPACITY-ONLY fade: the container is pinned to the sticky viewport
+       * and the line never changes position while scrolling — same place,
+       * just appearing later. (Dropped the old 26px rise so the text stays
+       * absolutely still relative to the viewport.) */
       animation: px-line2-in linear both;
       animation-timeline: --pxscene;
-      animation-range: cover 57% cover 66%;
+      animation-range: cover 53% cover 57.6%;
     }
-    /* Thread legs ride the fg assembly, now begun in the roll-in: the rise
-     * draws spool→eye across mid-assembly (pin 37→75, cover 45→60) while
-     * the sewing world settles, and the tail keeps drawing (pin 55→96,
-     * cover 52→68) until just before the release. */
+    /* PHASE 5 — HOLD: the finished world sits motionless from PIN 50; the
+     * thread is ABSENT all the way through the assembly and only now, as
+     * the scroll continues, draws — rise spool→needle eye at pin 50→75
+     * (cover 50→64.1), tail out of the eye, down to the ground curl, at
+     * pin 75→95 (cover 64.1→75.4). Before each range the fill keeps the
+     * legs at dashoffset 100 = invisible. */
     .px-thread {
       animation: px-thread linear both;
       animation-timeline: --pxscene;
-      animation-range: cover 45% cover 60%;
+      animation-range: cover 50% cover 64.1%;
     }
     .px-thread-tail {
+      /* Tail out of the eye, down to the ground curl — finishes BEFORE the
+       * launch so the assembled world + thread is complete and holds a few
+       * pins of stillness (pin 88→92) while the scroll continues, before
+       * the rocket goes. pin 75→88 (cover 64.1→71.5). */
       animation: px-thread linear both;
       animation-timeline: --pxscene;
-      animation-range: cover 52% cover 68%;
+      animation-range: cover 64.1% cover 71.5%;
+    }
+    .px-rocket {
+      /* PHASE 6 — LAUNCH (variant "D · Arc into centre", adapted): the
+       * rocket group parks on the seam through every earlier phase
+       * (fill both) — INCLUDING the beat of stillness after the thread
+       * completes (thread done at PIN 88, quiet 88→92) — then from PIN 92:
+       * tips at its base and ARCS up-left along its one path, GROWING so
+       * much it covers most of the scene — until the zoom sweeps it right
+       * past the viewport edge, fully OFF-SCREEN (transform only, NO fade)
+       * by the release (PIN 100). transform-origin is the rocket's base on
+       * the seam (1280,810 user units). */
+      animation: px-rocket linear both;
+      animation-timeline: --pxscene;
+      animation-range: cover 73.7% cover 78.2%;
+      transform-origin: 1280px 810px;
+      transform-box: view-box;
     }
     .px-layer {
       will-change: transform;
@@ -294,9 +341,10 @@ body {
   }
 }
 /* Mid sheet (distant ridge): crest parked just below the fold (+9.5% =
- * the offset that puts the crest exactly on the fold at PIN −34, cover
- * 17, where the range begins) — sweeps up through the roll-in, lands at
- * native 47.7% through the range (= pin 30), then departs −34%. */
+ * the offset that puts the crest exactly on the fold at PIN −17, cover
+ * 12.2, where the range begins) — sweeps up through the roll-in, lands at
+ * native 47.7% through the range (= pin 15), then departs to −34% (the
+ * sweep completing by pin 50) and holding through the still phase. */
 @keyframes px-mid {
   0% {
     transform: translate3d(0, 9.5%, 0);
@@ -310,10 +358,11 @@ body {
 }
 
 /* Front band (nearer mountains): crest parked just below the fold (+25.1%
- * = puts the crest on the fold at PIN −14, cover 25.8, where the range
+ * = puts the crest on the fold at PIN −6, cover 18.5, where the range
  * begins) — it arrives AFTER the distant ridge has basically landed
  * (more detached start), lands at native 46.2% through the range (= pin
- * 40, as timed), then out-travels the ridge to −45%. */
+ * 20, as timed), then out-travels the ridge to −45% (done by pin 50) and
+ * holds through the still phase. */
 @keyframes px-midfront {
   0% {
     transform: translate3d(0, 25.1%, 0);
@@ -329,11 +378,11 @@ body {
 /* Fg sheet (sewing world — EXACTLY the reference composition
  * vyn-parallax-elements.html: ground seam and sewing feet at 810 units
  * (84.7svh), tape-measure ruler attached to this sheet): crest (needle
- * tip) parked just below the fold (+19.2% = tip on the fold at PIN −12,
- * cover 26, where the range begins), rises slowest beneath the mountain
- * bands and lands at a −6% REST exactly at the pin's end — the seam
- * settles at 78.7svh and the ruler strip (art y 946–988), riding the
- * same transform, tops the fold ~PIN 11 and rests at 94–98.7svh, the
+ * tip) parked just below the fold (+19.2% = tip on the fold at PIN −5,
+ * cover 18.7, where the range begins), rises slowest beneath the mountain
+ * bands and lands at a −6% REST at PIN 50 (the start of the hold phase) —
+ * the seam settles at 78.7svh and the ruler strip (art y 946–988), riding
+ * the same transform, tops the fold ~PIN 5 and rests at 94–98.7svh, the
  * visible bottom datum above the projects contact line. */
 @keyframes px-fg {
   0% {
@@ -356,16 +405,16 @@ body {
 @keyframes px-line2-in {
   from {
     opacity: 0;
-    transform: translate3d(0, 26px, 0);
   }
   to {
     opacity: 1;
-    transform: none;
   }
 }
-/* Thread draw: each thread leg declares pathLength=100 with a dashed
- * stroke length of 100, so one offset value pulls it from fully hidden to
- * fully drawn — rising leg then falling leg, like threading the needle. */
+/* Thread draw (PHASE 5 — hold): each thread leg declares pathLength=100
+ * with a dashed stroke length of 100, so one offset value pulls it from
+ * fully hidden to fully drawn — the legs sit hidden (offset 100) through
+ * the whole assembly, then draw spool→eye and eye→ground out of the
+ * still frame, like threading the needle at leisure. */
 @keyframes px-thread {
   from {
     stroke-dashoffset: 100;
@@ -375,13 +424,39 @@ body {
   }
 }
 
+/* Rocket launch (PHASE 6 — variant D "arc into centre", from
+ * rocket-takeoff-variants.html, adapted per review): parked until PIN 88,
+ * tips at the base (-10°→-14°→-16°), arcs up-left through the screen
+ * centre while ZOOMING 1.3× → 4× → 30× → 40× — the zoom sweeps the rocket
+ * completely off-screen by PIN 100 (transform only, NO fade-out).
+ * Stop list now every segment diagonal (no sideways jog): 0/0.26/0.60/1
+ * windowed over cover 73.7→78.2 (= PIN 92→100, after the thread + the
+ * quiet beat); the scale growth covers most of the scene — 1.6× → 12× →
+ * 56× — and the last stop pushes the body fully past the top-left
+ * corner. */
+@keyframes px-rocket {
+  0% {
+    transform: rotate(0deg) translate3d(0, 0, 0) scale(1);
+  }
+  26% {
+    transform: rotate(-10deg) translate3d(-70px, -210px, 0) scale(1.6);
+  }
+  60% {
+    transform: rotate(-14deg) translate3d(-560px, -640px, 0) scale(12);
+  }
+  100% {
+    transform: rotate(-16deg) translate3d(-2500px, -1800px, 0) scale(56);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .px-scene,
   .px-layer,
   .px-line1,
   .px-line2,
   .px-thread,
-  .px-thread-tail {
+  .px-thread-tail,
+  .px-rocket {
     animation: none !important;
     transform: none !important;
     opacity: 1 !important;
