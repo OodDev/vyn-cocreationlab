@@ -1,0 +1,7 @@
+node_modules
+out
+.next
+.DS_Store
+package-lock.json
+public/favicon
+public/images

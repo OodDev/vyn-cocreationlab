@@ -1,0 +1,27 @@
+# VYN – CoCreation Lab
+
+> VYN – CoCreation Lab is a web development studio focused on building fast, accessible, search-ready websites. Work spans AI-assisted tools, CMS builds and fully hand-coded applications. Tagline: *Vision Your Name*.
+
+## Pages
+
+- [Home](https://vyn-cocreation.com/): one-page portfolio with projects, about, FAQ and contact. Markdown: [index.md](https://vyn-cocreation.com/index.md)
+- [Projects index](https://vyn-cocreation.com/projects/): all 6 case studies grouped in three parts. Markdown: [projects.md](https://vyn-cocreation.com/projects.md)
+  - `ai-assisted-project-01` (ai-assisted): [case-study page](https://vyn-cocreation.com/projects/ai-assisted-project-01/) · markdown: [ai-assisted-project-01.md](https://vyn-cocreation.com/projects/ai-assisted-project-01.md)
+  - `ai-assisted-project-02` (ai-assisted): [case-study page](https://vyn-cocreation.com/projects/ai-assisted-project-02/) · markdown: [ai-assisted-project-02.md](https://vyn-cocreation.com/projects/ai-assisted-project-02.md)
+  - `cms-project-01` (cms): [case-study page](https://vyn-cocreation.com/projects/cms-project-01/) · markdown: [cms-project-01.md](https://vyn-cocreation.com/projects/cms-project-01.md)
+  - `cms-project-02` (cms): [case-study page](https://vyn-cocreation.com/projects/cms-project-02/) · markdown: [cms-project-02.md](https://vyn-cocreation.com/projects/cms-project-02.md)
+  - `hand-coded-project-01` (hand-coded): [case-study page](https://vyn-cocreation.com/projects/hand-coded-project-01/) · markdown: [hand-coded-project-01.md](https://vyn-cocreation.com/projects/hand-coded-project-01.md)
+  - `hand-coded-project-02` (hand-coded): [case-study page](https://vyn-cocreation.com/projects/hand-coded-project-02/) · markdown: [hand-coded-project-02.md](https://vyn-cocreation.com/projects/hand-coded-project-02.md)
+- [About](https://vyn-cocreation.com/about/): bio, experience, education, profiles. Markdown: [about.md](https://vyn-cocreation.com/about.md)
+- [Contact](https://vyn-cocreation.com/contact/): email-first, no forms. Markdown: [contact.md](https://vyn-cocreation.com/contact.md)
+
+## Entity
+
+- Name: VYN – CoCreation Lab (short: VYN)
+- Role: Web Developing
+- Contact: hello@vyn.example (mailto: mailto:hello@vyn.example?subject=Website%20enquiry%20%E2%80%94%20VYN%20%E2%80%93%20CoCreation%20Lab&body=Hi%20VYN%20%E2%80%93%20CoCreation%20Lab%2C%0A%0AI%20found%20your%20site%20and%20I'd%20like%20to%20talk%20about%20a%20project%3A%0A%0A)
+- GitHub: https://github.com/OodDev
+- LinkedIn: https://www.linkedin.com/in/paolo-montagna-789057b4/?isSelfProfile=true
+- Location: Your City, Country
+- Last updated: 2026-10-17
+- Expertise: Next.js, React, TypeScript, Tailwind CSS, Framer Motion, Headless CMS, Technical SEO, Core Web Vitals, AI-assisted development

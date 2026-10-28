@@ -1,0 +1,764 @@
+@import "tailwindcss";
+
+/*
+ * ─── VYN design tokens ─────────────────────────────────────────────────────
+ * Palette derived from the provided hero artwork (main-bg.jpg):
+ * near-black teal, neon cyan accent, neon green secondary.
+ * accent-3 = orange #f79c00 (see palette-orange.html for the
+ * full exploration the value came from).
+ * Dark mode (OLED-dark) is the single intended theme; tokens are structured
+ * so a light theme can be added later (see AddLightModeLater.txt).
+ *
+ * Contrast (checked against --color-bg):
+ *   ink 16:1 · muted 7.9:1 · accent 10:1 · accent-2 9.6:1 · accent-3 9.1:1
+ *   → WCAG 2.2 AA ✓
+ * ───────────────────────────────────────────────────────---──────────────────
+ */
+@theme {
+  --color-bg: #050d10;
+  --color-surface: #0a161a;
+  --color-elev: #0e1e24;
+  --color-line: rgba(90, 216, 232, 0.16);
+  --color-line-strong: rgba(90, 216, 232, 0.32);
+  --color-accent: #4be1ec;
+  --color-accent-dim: #2ba7b3;
+  --color-accent-2: #45e083;
+  --color-accent-3: #f79c00;
+  --color-ink: #e9f4f4;
+  --color-muted: #9db3b8;
+  --color-faint: #6d868c;
+
+  --font-display: var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
+
+  --radius-card: 1rem;
+  --radius-pill: 62.4375rem;
+
+  --shadow-glow: 0 0 10px rgba(75, 225, 236, 0.28), 0 0 42px rgba(75, 225, 236, 0.1);
+  --shadow-glow-2: 0 0 10px rgba(69, 224, 131, 0.28), 0 0 42px rgba(69, 224, 131, 0.1);
+  --shadow-glow-3: 0 0 10px rgba(247, 156, 0, 0.28), 0 0 42px rgba(247, 156, 0, 0.1);
+
+  --ease-spring: cubic-bezier(0.34, 1.3, 0.64, 1);
+
+  --animate-drift: drift 26s ease-in-out infinite alternate;
+  --animate-glow: glow 5.5s ease-in-out infinite;
+}
+
+@theme inline {
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ─── Base ─────────────────────────────────────────────────────────────── */
+html {
+  scroll-behavior: smooth;
+  color-scheme: dark;
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: clip;
+}
+
+::selection {
+  background: rgba(75, 225, 236, 0.28);
+  color: #ffffff;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* Reusable page container */
+.shell {
+  width: 100%;
+  margin-inline: auto;
+  max-width: 76rem;
+  padding-inline: clamp(1.25rem, 4vw, 3.5rem);
+}
+
+/* Hairline neon divider */
+.neon-hairline {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(75, 225, 236, 0.55) 35%,
+    rgba(69, 224, 131, 0.35) 70%,
+    transparent
+  );
+}
+
+.text-glow {
+  text-shadow:
+    0 0 10px rgba(75, 225, 236, 0.4),
+    0 0 34px rgba(75, 225, 236, 0.16);
+}
+
+.text-glow-2 {
+  text-shadow:
+    0 0 10px rgba(69, 224, 131, 0.4),
+    0 0 34px rgba(69, 224, 131, 0.16);
+}
+
+/* Orange (accent-3) twin used by the parallax statement. */
+.text-glow-3 {
+  text-shadow:
+    0 0 10px rgba(247, 156, 0, 0.4),
+    0 0 34px rgba(247, 156, 0, 0.16);
+}
+
+/* Kicker label (mono-flavoured via letter-spacing) */
+.kicker {
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+}
+
+/* ─── Scroll-reveal system (CSS scroll-driven, zero JS) ─────────────────
+ * Progressive enhancement: elements are VISIBLE in the initial HTML. Where
+ * the browser supports scroll-driven animation timelines, a view() timeline
+ * drives the entrance as the element scrolls into view; elsewhere (including
+ * older Safari and all crawlers/no-JS) the static state stands. The old
+ * JS-driven gate (`data-motion`) is no longer required: scroll timelines are
+ * engine-driven, always work, and animate opacity/transform only.
+ * ──────────────────────────────────────────────────────────────────── */
+@supports (animation-timeline: view()) and (animation-range: normal normal) {
+  @media (prefers-reduced-motion: no-preference) {
+    .reveal {
+      animation: reveal-up 0.55s var(--ease-out-expo, cubic-bezier(0.16, 1, 0.3, 1))
+        var(--reveal-delay, 0s) both;
+      animation-timeline: view();
+      animation-range: entry 4% entry 62%;
+    }
+  }
+}
+
+@keyframes reveal-up {
+  from {
+    opacity: 0;
+    transform: translate3d(0, var(--reveal-offset, 22px), 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    animation: none !important;
+  }
+}
+
+/* ─── Parallax scene (CSS scroll-driven, zero JS) ───────────────────────
+ * The wrapper is 230svh, so its view() cover phase spans 330svh of scroll.
+ * The wrapper publishes a NAMED view timeline (--pxscene) and every px-*
+ * animation references it — the layers live inside the sticky viewport, so
+ * their own view() progress is frozen mid-pin (element never moves relative
+ * to the viewport → timeline stuck at 50%). The named timeline tracks the
+ * wrapper itself, whose rect does traverse the viewport while pinned.
+ * The pinned segment (wrapper top at viewport top → wrapper bottom at
+ * viewport bottom) is view-progress 30.3% → 69.7%; the keyframes clamp to
+ * that window and replicate the pre-scroll-timeline stage motion:
+ * bg 0→16%, mid 0→34%, fg 0→56% + scale 1→1.12 (all upward — the world
+ * departs through the top of the fold as you scroll down) · statement line 1 in
+ * 31→40%, out 47→55% · line 2 in 57→66% · the orange thread draws from the
+ * spool up to the needle's eye 31→44% and falls out of the eye onto the
+ * ground 38→52% — tied to the sewing world's own flight: the fg layer
+ * rises past the fold, so its top edge exits the viewport at ~48% cover
+ * progress and both legs must finish drawing just before that.
+ * Artwork: "Paper Seams" (see features/parallax/layer-art.tsx). */
+@supports (animation-timeline: view()) and (animation-range: normal normal) {
+  @media (prefers-reduced-motion: no-preference) {
+    .px-scene {
+      view-timeline: --pxscene block;
+      animation: px-empty linear both;
+      animation-timeline: --pxscene;
+      animation-range: cover;
+    }
+    .px-layer-bg {
+      animation: px-bg linear both;
+      animation-timeline: --pxscene;
+      animation-range: cover 30.3% cover 69.7%;
+    }
+    .px-layer-mid {
+      animation: px-mid linear both;
+      animation-timeline: --pxscene;
+      animation-range: cover 30.3% cover 69.7%;
+    }
+    .px-layer-fg {
+      animation: px-fg linear both;
+      animation-timeline: --pxscene;
+      animation-range: cover 30.3% cover 69.7%;
+    }
+    .px-statement-inner {
+      display: grid;
+      justify-items: center;
+    }
+    .px-line1,
+    .px-line2 {
+      grid-area: 1 / 1;
+    }
+    .px-line1 {
+      animation:
+        px-line1-in linear both,
+        px-line1-out linear forwards;
+      animation-timeline: --pxscene, --pxscene;
+      animation-range: cover 31% cover 40%, cover 47% cover 55%;
+    }
+    .px-line2 {
+      animation: px-line2-in linear both;
+      animation-timeline: --pxscene;
+      animation-range: cover 57% cover 66%;
+    }
+    .px-thread {
+      animation: px-thread linear both;
+      animation-timeline: --pxscene;
+      animation-range: cover 31% cover 44%;
+    }
+    .px-thread-tail {
+      animation: px-thread linear both;
+      animation-timeline: --pxscene;
+      animation-range: cover 38% cover 52%;
+    }
+    .px-layer {
+      will-change: transform;
+    }
+  }
+}
+
+/* Empty animation: pins `view()` activation without mutating the scene. */
+@keyframes px-empty {
+  from,
+  to {
+    transform: none;
+  }
+}
+@keyframes px-bg {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(0, -16%, 0);
+  }
+}
+@keyframes px-mid {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(0, -34%, 0);
+  }
+}
+@keyframes px-fg {
+  from {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  to {
+    transform: translate3d(0, -56%, 0) scale(1.12);
+  }
+}
+@keyframes px-line1-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 26px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+/* Line 1 exits only forwards: before its exit range the animation must NOT
+ * apply (a backwards fill would re-show the text over the entrance's
+ * opacity: 0 — the later animation in the list wins). */
+@keyframes px-line1-out {
+  from {
+    opacity: 1;
+    transform: none;
+  }
+  to {
+    opacity: 0;
+    transform: translate3d(0, 22px, 0);
+  }
+}
+@keyframes px-line2-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 26px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+/* Thread draw: each seam path declares pathLength=100, so one offset value
+ * pulls the whole line left→right like a needle stroke. */
+/* Thread draw: each thread leg declares pathLength=100 with a dashed
+ * stroke length of 100, so one offset value pulls it from fully hidden to
+ * fully drawn — rising leg then falling leg, like threading the needle. */
+@keyframes px-thread {
+  from {
+    stroke-dashoffset: 100;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .px-scene,
+  .px-layer,
+  .px-line1,
+  .px-line2,
+  .px-thread,
+  .px-thread-tail {
+    animation: none !important;
+    transform: none !important;
+    opacity: 1 !important;
+  }
+  /* Collapsed static scene when motion is reduced. */
+  .px-scene {
+    height: 80svh !important;
+  }
+  .px-sticky {
+    position: static !important;
+    height: 80svh !important;
+  }
+}
+
+/* ─── Header scroll progress bar (CSS scroll() timeline) ──────────────── */
+@supports (animation-timeline: scroll()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .px-progressbar {
+      animation: progress-grow linear both;
+      animation-timeline: scroll(root block);
+    }
+  }
+}
+
+@keyframes progress-grow {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* ─── Splashscreen ─────────────────────────────────────────────────────── */
+.splash {
+  /* MUST NOT be position:fixed: Chromium gives fixed layers a compositor
+   * clip at the viewport bounds, which re-creates the "painted rect ==
+   * viewport rect" exclusion for the artwork inside (verified empirically,
+   * see t18/t19 test pages) and would strip the LCP image. Absolutely
+   * positioned at page top it is visually identical (the page cannot be
+   * scrolled until this overlay leaves) and the artwork paint survives.
+   * The container's own background sits behind its children and never
+   * occludes the LCP image. */
+  position: absolute;
+  inset: 0;
+  z-index: 100;
+  display: none;
+  place-items: center;
+  background-color: var(--color-bg);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+html[data-splash="on"] .splash {
+  display: grid;
+}
+
+/* Leaving phase: the background stays FULLY opaque (the hero must not be
+ * visible behind the logo) — only the wordmark + kicker content fades, then
+ * the whole overlay unmounts and the hero entrance un-pauses. */
+.splash.is-leaving {
+  pointer-events: none;
+}
+
+html[data-splash="on"] .splash.is-leaving .splash-fade-in,
+html[data-splash="on"] .splash.is-leaving .splash-fade-mid,
+html[data-splash="on"] .splash.is-leaving .splash-fade-late {
+  animation: fade-out 0.45s ease forwards;
+}
+
+html[data-splash="on"] .splash-fade-mid {
+  opacity: 0;
+  animation: fade-in 0.6s 0.4s ease forwards;
+}
+
+html[data-splash="on"] .splash-fade-late {
+  opacity: 0;
+  animation: fade-in 0.6s 0.7s ease forwards;
+}
+
+/* ── PolarisBreathe wordmark — the chosen logo (LOGO-CHOSEN.md; recipe of
+ * record: vyn-polaris-breathe.html, site variant: stretched 20% vertically,
+ * dashes 25% thinner, ALL timings × 0.8 = 20% faster). Four stages:
+ *
+ *   1  0–1.2s     compass + pulse: backdrop glints drift in, ring fades up,
+ *                 needle swings −115° → +16° → −9° → 0, radar wave fires
+ *   2  1.2–2.8s   magnetized stars: 11 nodes fly in from off-frame
+ *                 (--nd/--fx/--fy), land with a double bounce, then breathe
+ *                 in perfect sync (100↔80% opacity, 1↔1.3 scale); the
+ *                 keystone keeps its stronger glow-pulse (key-glow, later in
+ *                 the stack, wins over the shared breathe)
+ *   3  2.84–4s    two fast pencil runners drag white trails that MEET on the
+ *                 keystone; trails fade out at 4s
+ *   4  3.76s → ∞  dashed edges fade in and march forever — the glow lives on
+ *                 a separate static filtered layer (c-eglow) so the marching
+ *                 dashes themselves stay crisp
+ */
+html[data-splash="on"] .splash .c-star {
+  /* backdrop glints, cyan at 18% (group opacity in the SVG) */
+  opacity: 0;
+  animation: star-in 0.56s var(--sd, 0.16s) ease both;
+}
+
+html[data-splash="on"] .splash .c-eglow {
+  opacity: 0;
+  will-change: opacity;
+  filter: drop-shadow(0 0 3.6px #4bd0e8ff) drop-shadow(0 0 13px #4da3ffd9);
+  animation: fade-in 0.36s 3.76s ease both;
+}
+
+html[data-splash="on"] .splash .c-edge {
+  opacity: 0;
+  animation:
+    fade-in 0.36s 3.76s ease both,
+    edge-march 0.96s linear 4.12s infinite;
+}
+
+/* Pencil trails: drawn at 2.84s (left leg is longer), gone again at 4s. */
+html[data-splash="on"] .splash .c-guide {
+  opacity: 0;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  filter: drop-shadow(0 0 4.32px #4bd0e8) drop-shadow(0 0 13px #4da3ffd9);
+  animation:
+    gdraw var(--gt, 0.64s) cubic-bezier(0.25, 0.1, 0.35, 1) 2.84s both,
+    fade-out 0.28s 4s forwards;
+}
+html[data-splash="on"] .splash .c-guide-l {
+  --gt: 0.4s;
+}
+html[data-splash="on"] .splash .c-guide-r {
+  --gt: 0.208s;
+}
+
+/* Runners: the white dots whose offset-path routes match the trails above. */
+html[data-splash="on"] .splash .c-run {
+  opacity: 0;
+  offset-distance: 0%;
+  animation:
+    rtravel var(--rt, 0.64s) cubic-bezier(0.25, 0.1, 0.35, 1) 2.84s both,
+    fade-out 0.24s 3.52s forwards;
+}
+html[data-splash="on"] .splash .c-run-l {
+  --rt: 0.4s;
+  offset-path: path("M52 45.6 L98 146.4 L144 45.6 L188 45.6 L232 98.4 L276 45.6 L318 45.6 L361 96");
+}
+html[data-splash="on"] .splash .c-run-r {
+  --rt: 0.208s;
+  offset-path: path("M404 45.6 L404 146.4 L361 96");
+}
+
+/* Nodes: magnetized fly-in + double landing bounce, then the shared
+ * synchronized breathe. The keystone stack adds the stronger key-glow pulse;
+ * as the later animation it overrides breathe's transform+opacity. */
+html[data-splash="on"] .splash .c-node {
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+  will-change: transform, opacity;
+  animation:
+    node-fly 0.56s cubic-bezier(0.3, 0, 0.4, 1) var(--nd, 1.2s) both,
+    node-breathe 2.08s ease-in-out calc(var(--nd, 1.2s) + 0.56s) infinite;
+}
+html[data-splash="on"] .splash .c-key {
+  animation:
+    node-fly 0.56s cubic-bezier(0.3, 0, 0.4, 1) var(--nd, 2.24s) both,
+    node-breathe 2.08s ease-in-out calc(var(--nd, 2.24s) + 0.56s) infinite,
+    key-glow 1.76s ease-in-out calc(var(--nd, 2.24s) + 0.6s) infinite;
+}
+
+/* Compass: ring fades first, needle swings into north with overshoot,
+ * hub dot follows. */
+html[data-splash="on"] .splash .c-ring {
+  opacity: 0;
+  animation: fade-in 0.4s 0s ease both;
+}
+html[data-splash="on"] .splash .c-needle {
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: needle-swing 0.84s 0.2s both;
+}
+html[data-splash="on"] .splash .c-hub {
+  opacity: 0;
+  animation: fade-in 0.24s 0s ease both;
+}
+
+/* Radar wave fired from the hub at 1.2s. */
+/* The radar wave escapes the mark's 480×168 viewBox: the SVG is allowed to
+ * paint beyond its own box, so the ring sweeps across the whole (still
+ * opaque) splash instead of dying at the logo's rectangle. */
+html[data-splash="on"] .splash .splash-logo {
+  overflow: visible;
+}
+
+html[data-splash="on"] .splash .c-wave {
+  opacity: 0;
+  transform-box: fill-box;
+  animation: wave-burst 1.6s cubic-bezier(0.2, 0.6, 0.4, 1) 1.2s both;
+}
+
+/* ── PolarisBreathe keyframes ──────────────────────────────────────── */
+
+@keyframes star-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes node-fly {
+  0% {
+    opacity: 0;
+    transform: translate(var(--fx, 0), var(--fy, 0)) scale(0.5);
+  }
+  12% {
+    opacity: 1;
+  }
+  48% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+  58% {
+    transform: translate(0, 3px) scale(0.94);
+  }
+  70% {
+    transform: translate(0, -3.5px) scale(1.07);
+  }
+  80% {
+    transform: translate(0, 1.5px) scale(0.97);
+  }
+  90% {
+    transform: translate(0, -1.5px) scale(1.03);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+}
+
+@keyframes node-breathe {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.3);
+  }
+}
+
+@keyframes key-glow {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.25);
+    opacity: 0.82;
+  }
+}
+
+@keyframes needle-swing {
+  0% {
+    opacity: 0;
+    transform: rotate(-115deg);
+  }
+  10% {
+    opacity: 1;
+    transform: rotate(-115deg);
+  }
+  55% {
+    transform: rotate(16deg);
+  }
+  72% {
+    transform: rotate(-9deg);
+  }
+  /* A/B VARIANT (Pol's request): the needle settles HORIZONTAL (pointing
+   * E–W) instead of north. Revert = change the final stop back to
+   * rotate(0deg) — everything else stays identical. */
+  100% {
+    opacity: 1;
+    transform: rotate(90deg);
+  }
+}
+
+@keyframes gdraw {
+  from {
+    stroke-dashoffset: 1;
+    opacity: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+}
+
+@keyframes rtravel {
+  0% {
+    offset-distance: 0%;
+    opacity: 0;
+  }
+  6% {
+    opacity: 1;
+  }
+  100% {
+    offset-distance: 100%;
+    opacity: 1;
+  }
+}
+
+@keyframes wave-burst {
+  0% {
+    r: 6px;
+    opacity: 0;
+  }
+  4% {
+    opacity: 0.85;
+  }
+  /* Fades away at half the run while the ring keeps expanding — the tail
+   * growth is invisible. Max radius 2000 units ≈ 2330px at the 560px logo
+   * scale, enough to clear the corners of a 4K viewport. */
+  50% {
+    opacity: 0;
+  }
+  100% {
+    r: 2000px;
+    opacity: 0;
+  }
+}
+
+@keyframes edge-march {
+  from {
+    stroke-dashoffset: 0;
+  }
+  to {
+    /* dash pattern "1 5" → period 6 → offset -6 per cycle */
+    stroke-dashoffset: -6;
+  }
+}
+
+@keyframes fade-in {
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+/* Hold the hero entrance while the splash is up: paused animations (fill:
+ * both) sit at their from-state. When the overlay unmounts, React removes
+ * `data-splash` in the same commit → play-state goes back to running and
+ * each hero element starts its own entrance from that moment (delays now
+ * count from the splash leaving, not from page load). No-JS and
+ * reduced-motion never get the flag, so this rule never applies there. */
+html[data-splash="on"] .hero-enter {
+  animation-play-state: paused;
+}
+
+/* Hero entrance (pure CSS: content stays readable without JS) */
+.hero-enter {
+  opacity: 0;
+  animation: enter-up 0.7s var(--ease-out-expo, cubic-bezier(0.16, 1, 0.3, 1))
+    var(--enter-delay, 0s) both;
+}
+
+@keyframes enter-up {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 26px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes enter-page {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 14px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes drift {
+  from {
+    transform: translate3d(-1.5%, -1%, 0);
+  }
+  to {
+    transform: translate3d(1.5%, 1%, 0);
+  }
+}
+
+@keyframes glow {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* ─── Reduced motion: final states, zero animation ─────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .splash {
+    display: none !important;
+  }
+  .reveal[data-revealed="true"],
+  .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}

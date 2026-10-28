@@ -1,0 +1,46 @@
+# robots.txt for VYN – CoCreation Lab
+# Build-time constant file — tweak freely; this is intentionally hand-written
+# so the AI-crawler list is easy to review and change.
+
+User-agent: * 
+Allow: /
+
+# AI + answer engines: explicitly allowed (AEO/GEO/LLMO requirement).
+# Remove individual lines below to opt out of any of them.
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-SearchBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+User-agent: Amazonbot
+Allow: /
+
+User-agent: cohere-ai
+Allow: /
+
+# Markdown mirrors for LLM ingestion
+# llms.txt:   /llms.txt
+# llms-full:  /llms-full.txt
+Sitemap: https://vyn-cocreation.com/sitemap.xml

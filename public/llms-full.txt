@@ -1,0 +1,139 @@
+# VYN – CoCreation Lab
+
+> VYN – CoCreation Lab is a web development studio focused on building fast, accessible, search-ready websites. Work spans AI-assisted tools, CMS builds and fully hand-coded applications. Tagline: *Vision Your Name*.
+
+## Pages
+
+- [Home](https://vyn-cocreation.com/): one-page portfolio with projects, about, FAQ and contact. Markdown: [index.md](https://vyn-cocreation.com/index.md)
+- [Projects index](https://vyn-cocreation.com/projects/): all 6 case studies grouped in three parts. Markdown: [projects.md](https://vyn-cocreation.com/projects.md)
+  - `ai-assisted-project-01` (ai-assisted): [case-study page](https://vyn-cocreation.com/projects/ai-assisted-project-01/) · markdown: [ai-assisted-project-01.md](https://vyn-cocreation.com/projects/ai-assisted-project-01.md)
+  - `ai-assisted-project-02` (ai-assisted): [case-study page](https://vyn-cocreation.com/projects/ai-assisted-project-02/) · markdown: [ai-assisted-project-02.md](https://vyn-cocreation.com/projects/ai-assisted-project-02.md)
+  - `cms-project-01` (cms): [case-study page](https://vyn-cocreation.com/projects/cms-project-01/) · markdown: [cms-project-01.md](https://vyn-cocreation.com/projects/cms-project-01.md)
+  - `cms-project-02` (cms): [case-study page](https://vyn-cocreation.com/projects/cms-project-02/) · markdown: [cms-project-02.md](https://vyn-cocreation.com/projects/cms-project-02.md)
+  - `hand-coded-project-01` (hand-coded): [case-study page](https://vyn-cocreation.com/projects/hand-coded-project-01/) · markdown: [hand-coded-project-01.md](https://vyn-cocreation.com/projects/hand-coded-project-01.md)
+  - `hand-coded-project-02` (hand-coded): [case-study page](https://vyn-cocreation.com/projects/hand-coded-project-02/) · markdown: [hand-coded-project-02.md](https://vyn-cocreation.com/projects/hand-coded-project-02.md)
+- [About](https://vyn-cocreation.com/about/): bio, experience, education, profiles. Markdown: [about.md](https://vyn-cocreation.com/about.md)
+- [Contact](https://vyn-cocreation.com/contact/): email-first, no forms. Markdown: [contact.md](https://vyn-cocreation.com/contact.md)
+
+## Entity
+
+- Name: VYN – CoCreation Lab (short: VYN)
+- Role: Web Developing
+- Contact: hello@vyn.example (mailto: mailto:hello@vyn.example?subject=Website%20enquiry%20%E2%80%94%20VYN%20%E2%80%93%20CoCreation%20Lab&body=Hi%20VYN%20%E2%80%93%20CoCreation%20Lab%2C%0A%0AI%20found%20your%20site%20and%20I'd%20like%20to%20talk%20about%20a%20project%3A%0A%0A)
+- GitHub: https://github.com/OodDev
+- LinkedIn: https://www.linkedin.com/in/paolo-montagna-789057b4/?isSelfProfile=true
+- Location: Your City, Country
+- Last updated: 2026-10-17
+- Expertise: Next.js, React, TypeScript, Tailwind CSS, Framer Motion, Headless CMS, Technical SEO, Core Web Vitals, AI-assisted development
+
+## About
+
+VYN – CoCreation Lab is the web developing practice behind this portfolio: a small team that designs and codes websites end to end. Work spans AI-assisted tools, CMS builds and hand-coded applications, delivered as fast, accessible, search-ready sites with verifiable results you can inspect on the project pages.
+
+{{BIO — 40–60 words: who VYN is, the specialisation, what makes it different, where you work. This paragraph ships as the answer to “Who is VYN – CoCreation Lab?” in search and AI summaries.}}
+
+### Experience
+
+- {{PERIOD, e.g. 2022 – 2025}}: {{ROLE}} — {{COMPANY}}. {{WHAT YOU SHIPPED AND WHY IT MATTERED}}
+- {{PERIOD}}: {{ROLE}} — {{COMPANY}}. {{WHAT YOU SHIPPED AND WHY IT MATTERED}}
+
+### Education
+
+- {{PERIOD}}: {{DEGREE}} — {{INSTITUTION}}
+- {{PERIOD}}: {{DEGREE}} — {{INSTITUTION}}
+
+# {{PROJECT TITLE}}
+
+Category: ai-assisted · updated 2026-10-17
+
+{{PROJECT DESCRIPTION}} — one or two sentences on what the project does, what was built and the outcome.
+
+Stack: {{STACK}}
+
+Links: [live](pending) · [repo](pending) · [HTML page](https://vyn-cocreation.com/projects/ai-assisted-project-01/)
+
+---
+
+# {{PROJECT TITLE}}
+
+Category: ai-assisted · updated 2026-10-17
+
+{{PROJECT DESCRIPTION}}
+
+Stack: {{STACK}}
+
+Links: [live](pending) · [repo](pending) · [HTML page](https://vyn-cocreation.com/projects/ai-assisted-project-02/)
+
+---
+
+# {{PROJECT TITLE}}
+
+Category: cms · updated 2026-10-17
+
+{{PROJECT DESCRIPTION}}
+
+Stack: {{STACK}}
+
+Links: [live](pending) · [repo](pending) · [HTML page](https://vyn-cocreation.com/projects/cms-project-01/)
+
+---
+
+# {{PROJECT TITLE}}
+
+Category: cms · updated 2026-10-17
+
+{{PROJECT DESCRIPTION}}
+
+Stack: {{STACK}}
+
+Links: [live](pending) · [repo](pending) · [HTML page](https://vyn-cocreation.com/projects/cms-project-02/)
+
+---
+
+# {{PROJECT TITLE}}
+
+Category: hand-coded · updated 2026-10-17
+
+{{PROJECT DESCRIPTION}}
+
+Stack: {{STACK}}
+
+Links: [live](pending) · [repo](pending) · [HTML page](https://vyn-cocreation.com/projects/hand-coded-project-01/)
+
+---
+
+# {{PROJECT TITLE}}
+
+Category: hand-coded · updated 2026-10-17
+
+{{PROJECT DESCRIPTION}}
+
+Stack: {{STACK}}
+
+Links: [live](pending) · [repo](pending) · [HTML page](https://vyn-cocreation.com/projects/hand-coded-project-02/)
+
+## Frequently asked questions
+
+### Who is VYN – CoCreation Lab?
+
+VYN – CoCreation Lab is the web developing practice behind this portfolio. It designs and builds websites end to end across three modes of delivery: AI-assisted projects, CMS projects and hand-coded applications.
+
+### What services does VYN – CoCreation Lab offer?
+
+Design-to-launch website development: marketing sites, web applications, headless CMS builds and AI-assisted tooling — always delivered with technical SEO, Core Web Vitals budgets and WCAG 2.2 AA accessibility practices built in.
+
+### What technologies does VYN – CoCreation Lab work with?
+
+The default stack is Next.js, React, TypeScript, Tailwind CSS and Framer Motion, with a Zod-validated content layer. CMS projects connect to headless or classic CMS platforms; hand-coded projects fall back to lighter, dependency-free setups when they serve the goal better.
+
+### How can I hire VYN – CoCreation Lab?
+
+Write an email — every contact link on this site opens a pre-filled message. Describe your project briefly and you will get a reply about scope, timeline and pricing.
+
+### Where is VYN – CoCreation Lab located?
+
+{{LOCATION / REMOTE POLICY}}.
+
+### Why “Vision Your Name”?
+
+It is the tagline behind the VYN name: the lab builds websites that put your name, product or idea in front of people with clarity and speed.
