@@ -52,6 +52,25 @@
 html {
   scroll-behavior: smooth;
   color-scheme: dark;
+  /* Classic-scrollbar systems keep the gutter reserved while the splash
+   * scroll-lock hides the bar, so re-locking/un-locking can't reflow the
+   * whole page by one scrollbar-width (no effect on overlay scrollbars). */
+  scrollbar-gutter: stable;
+}
+
+/* Splash scroll lock: the boot script (lib/client-flags.ts) sets
+ * data-splash="on" BEFORE first paint, and the splash component removes
+ * the attribute exactly when the overlay leaves — both the natural end
+ * and the click/Esc/Enter/Space skip. The lock therefore needs no JS of
+ * its own: scrolling, scroll restoration and anchor jumps are dead until
+ * the animation is truly over. Reduced-motion / no-JS users never get the
+ * attribute and are never locked. */
+html[data-splash="on"] {
+  overflow: hidden;
+  /* iOS Safari keeps momentum-chaining to the document unless explicitly
+   * cut off; the absolute (not fixed — see .splash LCP note) overlay also
+   * takes touch-action: none so a swipe landing on it starts nothing. */
+  overscroll-behavior: none;
 }
 
 body {
@@ -484,6 +503,144 @@ body {
   }
 }
 
+/* ─── Projects: horizontal scroll act (CSS scroll-driven, zero JS) ───────
+ * Act 2 after the parallax release: the projects section becomes a second
+ * pinned scene. A 400svh wrapper (.hs-scene) publishes a named view
+ * timeline (--hscene); its sticky 100svh viewport (.hs-sticky) holds the
+ * heading (with a progress rail) plus a horizontal TRACK of the three
+ * category panels (.hs-track) that translates LEFT while the page scrolls
+ * DOWN — the wheel never changes direction. Pin bookkeeping mirrors the
+ * parallax scene: for a 400svh wrapper the pinned segment (wrapper top at
+ * viewport top → wrapper bottom at viewport bottom) is view-progress
+ * 20% → 80%, so the move runs cover 20.5% → 79.5% (≈300svh of scroll for
+ * the full travel). Travel = track width − 100vw, expressed as
+ * translateX(calc(-100% + 100vw)) — % resolves against the max-content
+ * track itself. Desktop only (≥768px): phones, reduced motion and
+ * scroll-timeline-less browsers keep the stacked vertical grid — the
+ * default markup is that grid; the act is pure additive CSS. */
+.hs-progress {
+  display: none; /* decorative rail; only shown inside the act */
+}
+
+@supports (animation-timeline: view()) and (animation-range: normal normal) {
+  @media (prefers-reduced-motion: no-preference) {
+    @media (min-width: 768px) {
+      .hs-scene {
+        height: 400svh;
+        padding-block: 0;
+        view-timeline: --hscene block;
+      }
+      .hs-sticky {
+        position: sticky;
+        top: 0;
+        height: 100svh;
+        overflow: clip;
+        display: grid;
+        grid-template-rows: auto 1fr;
+        padding-block: clamp(1.25rem, 3vh, 3rem);
+      }
+      .hs-head {
+        position: relative;
+        z-index: 10;
+      }
+      /* Cards + headings inside the pinned viewport never traverse the
+       * viewport while it is stuck, so their own view() progress would
+       * freeze mid-fade (same trap the parallax layers dodge): the act
+       * disables the reveal animation and shows them settled. */
+      .hs-sticky .reveal {
+        animation: none;
+        opacity: 1;
+        transform: none;
+      }
+      .hs-note {
+        display: none;
+      }
+      .hs-trackzone {
+        display: flex;
+        align-items: center;
+        min-height: 0;
+      }
+      .hs-track {
+        display: flex;
+        align-items: stretch;
+        gap: clamp(2rem, 4vw, 4rem);
+        width: max-content;
+        /* Track start honors the .shell left line on any screen width. */
+        padding-inline: max(
+          clamp(1.25rem, 4vw, 3.5rem),
+          calc((100vw - 76rem) / 2 + clamp(1.25rem, 4vw, 3.5rem))
+        );
+        will-change: transform;
+        animation: hs-move linear both;
+        animation-timeline: --hscene;
+        animation-range: cover 20.5% cover 79.5%;
+      }
+      .hs-panel {
+        width: min(88vw, 76rem);
+        flex-shrink: 0;
+        margin-top: 0;
+        display: flex;
+        flex-direction: column;
+      }
+      .hs-panel-cards {
+        display: flex;
+        gap: clamp(1.5rem, 2.5vw, 2rem);
+        margin-top: 1.75rem;
+        flex: 1;
+        align-items: stretch;
+      }
+      .hs-panel-cards > .reveal {
+        flex: 1 1 0;
+        display: flex;
+      }
+      .hs-panel-cards > .reveal > a {
+        width: 100%;
+      }
+      .hs-progress {
+        display: block;
+        margin-top: 1.25rem;
+        height: 2px;
+        width: min(18rem, 42vw);
+        border-radius: 999px;
+        overflow: hidden;
+        background: var(--color-line);
+      }
+      .hs-progress-fill {
+        display: block;
+        height: 100%;
+        border-radius: inherit;
+        background: linear-gradient(90deg, var(--color-accent), var(--color-accent-2));
+        transform: scaleX(0);
+        transform-origin: 0 50%;
+        animation: hs-progress linear both;
+        animation-timeline: --hscene;
+        animation-range: cover 20.5% cover 79.5%;
+      }
+      /* Short viewports: keep the pinned composition from clipping. */
+      @media (max-height: 760px) {
+        .hs-panel-cards > .reveal > a {
+          min-height: 15rem;
+        }
+        .hs-panel-cards {
+          margin-top: 1.25rem;
+        }
+      }
+    }
+  }
+}
+
+@keyframes hs-move {
+  to {
+    transform: translate3d(calc(-100% + 100vw), 0, 0);
+  }
+}
+
+@keyframes hs-progress {
+  to {
+    transform: scaleX(1);
+  }
+}
+
 /* ─── Header scroll progress bar (CSS scroll() timeline) ──────────────── */
 @supports (animation-timeline: scroll()) {
   @media (prefers-reduced-motion: no-preference) {
@@ -521,6 +678,9 @@ body {
   background-color: var(--color-bg);
   opacity: 1;
   pointer-events: auto;
+  /* Whole overlay is a dead-zone while the splash runs: any touch/swipe on
+   * it must not start panning the (locked) document beneath. */
+  touch-action: none;
 }
 
 html[data-splash="on"] .splash {
@@ -614,7 +774,9 @@ html[data-splash="on"] .splash .c-run {
 }
 html[data-splash="on"] .splash .c-run-l {
   --rt: 0.4s;
-  offset-path: path("M52 45.6 L98 146.4 L144 45.6 L188 45.6 L232 98.4 L276 45.6 L318 45.6 L361 96");
+  offset-path: path(
+    "M52 45.6 L98 146.4 L144 45.6 L188 45.6 L232 98.4 L276 45.6 L318 45.6 L361 96"
+  );
 }
 html[data-splash="on"] .splash .c-run-r {
   --rt: 0.208s;

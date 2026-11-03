@@ -13,16 +13,18 @@ export interface SmartImageAsset {
   fallback: { src: string; width: number; height: number };
 }
 
-/** Provided hero artwork: 4778×2688 master (main-bg_UPSCAL.png), re-encoded
- * to AVIF/WebP (ladder mirrors scripts/generate-assets.ts). */
+/** Provided hero artwork: 5414×2688 transparent master
+ * (main-bg_transpUPSCAL_PSsharpeFus.png), re-encoded to AVIF/WebP (ladder
+ * mirrors scripts/generate-assets.ts). NOTE: wider than 16:9 (≈2.01:1) —
+ * the hero's object-cover trims the sides at typical viewports. */
 const HERO_WIDTHS: Array<{ w: number; h: number }> = [
-  { w: 640, h: 360 },
-  { w: 960, h: 540 },
-  { w: 1280, h: 720 },
-  { w: 1600, h: 900 },
-  { w: 1920, h: 1080 },
-  { w: 3200, h: 1800 },
-  { w: 4778, h: 2688 },
+  { w: 640, h: 318 },
+  { w: 960, h: 477 },
+  { w: 1280, h: 636 },
+  { w: 1600, h: 795 },
+  { w: 1920, h: 954 },
+  { w: 3200, h: 1590 },
+  { w: 5414, h: 2688 },
 ];
 
 function buildSrcSet(extension: "avif" | "webp"): string {
@@ -36,7 +38,7 @@ export const heroImage: SmartImageAsset = {
     { srcSet: buildSrcSet("avif"), type: "image/avif" },
     { srcSet: buildSrcSet("webp"), type: "image/webp" },
   ],
-  fallback: { src: "/images/hero/bg-1280.webp", width: 1280, height: 720 },
+  fallback: { src: "/images/hero/bg-1280.webp", width: 1280, height: 636 },
 };
 
 export const HERO_SIZES = "100vw";

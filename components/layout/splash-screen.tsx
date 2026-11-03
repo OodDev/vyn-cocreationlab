@@ -83,6 +83,19 @@ export function SplashScreen(): JSX.Element | null {
       }
     };
 
+    // Scroll lock itself is pure CSS off the pre-paint flag
+    // (html[data-splash="on"] → overflow hidden, see globals.css). But the
+    // keyboard could still reach links BENEATH the overlay, so everything
+    // else in <body> is made inert for the splash's whole run (restored in
+    // cleanup). The splash itself stays interactive (click-to-skip).
+    const splashEl: Element | null = document.querySelector(".splash");
+    const inertList: HTMLElement[] = Array.from(document.body.children).filter(
+      (el): el is HTMLElement => el instanceof HTMLElement && el !== splashEl,
+    );
+    for (const el of inertList) {
+      el.setAttribute("inert", "");
+    }
+
     const skip = (): void => {
       skipRef.current = undefined;
       if (done) return;
@@ -114,15 +127,15 @@ export function SplashScreen(): JSX.Element | null {
     };
     window.addEventListener("keydown", onKeyDown);
 
-    (document.querySelector<HTMLElement>(".splash") as HTMLElement | null)?.addEventListener(
-      "click",
-      skip,
-    );
+    splashEl?.addEventListener("click", skip);
 
     return function clearSplash(): void {
       clearAllTimers();
       window.removeEventListener("keydown", onKeyDown);
       skipRef.current = undefined;
+      for (const el of inertList) {
+        el.removeAttribute("inert");
+      }
       rememberVisit();
     };
   }, []);
@@ -137,10 +150,7 @@ export function SplashScreen(): JSX.Element | null {
 
   return (
     <div
-      className={cn(
-        "splash",
-        phase === "leaving" && "is-leaving",
-      )}
+      className={cn("splash", phase === "leaving" && "is-leaving")}
       aria-hidden="true"
       onClick={skipViaReact}
     >
@@ -152,7 +162,34 @@ export function SplashScreen(): JSX.Element | null {
        * overlay's own hero copy also means no duplicate hero download —
        * the hero image below loads for the hero, uncorked when the splash
        * leaves. */}
+      {/* Grain across the WHOLE splash overlay (direct child of .splash, not
+       * of the fade group — see comment): breaking the glow's 8-bit ramp up
+       * with fine grain removes the concentric quantization rings, and if it
+       * were clipped to the glow's 40vmin disc its own edge would read as a
+       * ring instead. */}
+      <div
+        className="pointer-events-none absolute inset-0"
+        aria-hidden="true"
+        style={{
+          backgroundRepeat: "repeat",
+          backgroundSize: "128px 128px",
+          // 50%-grey noise under `overlay` is the identity transform: the grain
+          // dithers both brighter AND darker around the true colour, so it
+          // breaks the ramp's quantization steps WITHOUT the +6/255 mean lift
+          // that the previous screen-blend version gave the whole overlay
+          // (splash read lighter than the hero behind it).
+          backgroundImage:
+            "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='128' height='128'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch' seed='7'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='128' height='128' filter='url(%23n)'/%3E%3C/svg%3E\")",
+          opacity: 0.35,
+          mixBlendMode: "overlay",
+        }}
+      />
       <div className="splash-fade-in relative flex flex-col items-center">
+        {/* Glow behind the mark. The teal radial ramp is short & steep over a
+         * near-black background, so its 8-bit quantization shows as concentric
+         * rings (Skia dithers gradients, but the blur-3xl pass averages the
+         * dither away and re-contours the steps). Dithering comes from the
+         * full-overlay grain layer, a sibling in .splash above. */}
         <div
           className="pointer-events-none absolute rounded-full blur-3xl"
           aria-hidden="true"
