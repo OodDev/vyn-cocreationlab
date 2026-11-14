@@ -55,7 +55,7 @@ import {
  *   the ruler tops the fold ~PIN 5 and rests 94–98.7svh). The planet
  *   sits behind the crest and the drafting circle loses its lower half
  *   en route. Departure sweeps begin as each band lands: the ridge leaves
- *   to −34%, the front band out-travels it to −25% (their departure
+ *   to −34%, the front band out-travels it to −30% (their departure
  *   completes by PIN 50), burying LINE 1 (sweep ~PIN 18→22).
  * · PHASE 4 · STATEMENT (PIN 50 → 60, inside the hold's opening stretch):
  *   LINE 2 (ink-white, z-40) fades in — no positional motion, one fixed
@@ -73,7 +73,7 @@ import {
  *   adapted): the zoom sweeps it completely off-screen — no fade — by
  *   the release.
  * · PHASE 7 · RELEASE (PIN 100 +): the frame exits upward: bg holds its
- *   −16% drift, mid −34%, midfront −25% already parked — the sewing
+ *   −16% drift, mid −34%, midfront −30% already parked — the sewing
  *   world holds at its −6% rest (the rocket already departed;
  *   ruler strip as the bottom datum) while
  *   the projects section scrolls in below, its blend gradient landing
@@ -146,7 +146,7 @@ export function ParallaxScene(): JSX.Element {
             </h2>
           </div>
         </div>
-        <div className="px-statement-2 absolute inset-x-0 bottom-[39svh] z-40 flex justify-center px-6">
+        <div className="px-statement-2 absolute inset-x-0 bottom-[41svh] z-40 flex justify-center px-6">
           <div className="px-statement-inner max-w-xl text-center">
             <h2 className="font-display text-[clamp(1.6rem,3.8vw,2.6rem)] leading-[1.15] font-bold text-balance">
               <span className="px-line2 text-ink block">

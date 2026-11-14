@@ -211,7 +211,7 @@ body {
  *   datum above the projects contact line). The planet is swallowed by
  *   the crest and the giant drafting circle loses its lower half to the
  *   arriving ridges en route. Departure begins as each band lands: bg to
- *   −16%, mid to −34%, midfront out-traveling to −25% — each depth ahead
+ *   −16%, mid to −34%, midfront out-traveling to −30% — each depth ahead
  *   of the one behind — the first ridge's departure sweep (~pin 18→22)
  *   burying line 1 (z-10 buried layer; it is COVERED, never faded out).
  *   Line 2 (ink-white, z-40) fades in at pin 50→60 (cover 53→57.6),
@@ -381,7 +381,7 @@ body {
  * = puts the crest on the fold at PIN −6, cover 18.5, where the range
  * begins) — it arrives AFTER the distant ridge has basically landed
  * (more detached start), lands at native 46.2% through the range (= pin
- * 20, as timed), then departs to −25% (held shallow so the band keeps
+ * 20, as timed), then departs to −30% (held shallow so the band keeps
  * most of the lower viewport for the sewing world and statement) and
  * holds through the still phase. */
 @keyframes px-midfront {
@@ -392,7 +392,7 @@ body {
     transform: translate3d(0, 0, 0);
   }
   100% {
-    transform: translate3d(0, -25%, 0);
+    transform: translate3d(0, -30%, 0);
   }
 }
 
