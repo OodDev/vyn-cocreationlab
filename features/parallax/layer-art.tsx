@@ -155,7 +155,13 @@ export function BackgroundLayer(): JSX.Element {
   return (
     <svg
       viewBox="0 0 1440 1000"
-      preserveAspectRatio="xMidYMid slice"
+      /* xMidYMax (bottom-anchored slice): on wide/short viewports the art is
+       * scaled by WIDTH and would otherwise crop top AND bottom equally —
+       * clipping the ruler strip (y 946–988), the scene's bottom datum.
+       * Anchoring to the bottom keeps the ruler/seam/ground fully visible;
+       * the crop moves to the top (sky), all five layers share it so they
+       * stay pixel-aligned with each other. */
+      preserveAspectRatio="xMidYMax slice"
       className="h-full w-full"
       xmlns="http://www.w3.org/2000/svg"
       aria-hidden="true"
@@ -286,7 +292,7 @@ export function MidgroundLayer(): JSX.Element {
   return (
     <svg
       viewBox="0 0 1440 1000"
-      preserveAspectRatio="xMidYMid slice"
+      preserveAspectRatio="xMidYMax slice"
       className="h-full w-full"
       xmlns="http://www.w3.org/2000/svg"
       aria-hidden="true"
@@ -341,7 +347,7 @@ export function MidgroundFrontLayer(): JSX.Element {
   return (
     <svg
       viewBox="0 0 1440 1000"
-      preserveAspectRatio="xMidYMid slice"
+      preserveAspectRatio="xMidYMax slice"
       className="h-full w-full"
       xmlns="http://www.w3.org/2000/svg"
       aria-hidden="true"
@@ -376,7 +382,7 @@ export function ForegroundLayer(): JSX.Element {
   return (
     <svg
       viewBox="0 0 1440 1000"
-      preserveAspectRatio="xMidYMid slice"
+      preserveAspectRatio="xMidYMax slice"
       className="h-full w-full"
       xmlns="http://www.w3.org/2000/svg"
       aria-hidden="true"
@@ -522,7 +528,7 @@ export function RocketLayer(): JSX.Element {
   return (
     <svg
       viewBox="0 0 1440 1000"
-      preserveAspectRatio="xMidYMid slice"
+      preserveAspectRatio="xMidYMax slice"
       className="h-full w-full"
       xmlns="http://www.w3.org/2000/svg"
       aria-hidden="true"
