@@ -43,20 +43,23 @@ import {
  *   #04090c sky, deep star field, moon, galaxy and the planet slide up on
  *   their full-roll drift; nothing else is in frame yet.
  * · PHASE 2 · ROLL-IN (PIN −24 → −5): the distant ridge crests the fold
- *   at PIN −17, the front band at −6, the sewing world (needle tip) at
- *   −5 — away from an empty sky, every band is mid-arrival at the lock.
+ *   at PIN −17, the sewing world (needle tip) at −5 — away from an empty
+ *   sky, every band is mid-arrival at the lock. The front band rides
+ *   GLUED to the distant ridge the whole way (same silhouette, crest
+ *   line superimposed — one line in frame, see px-midfront).
  *   LINE 1 fades slowly through this stretch (−23 → −10).
  * · PHASE 3 · ASSEMBLY (PIN −5 → 15/20/50): the closer planes overtake
- *   the farther as they rise: the ridge lands 15, the front band 20, and
- *   the sewing world — exactly the reference composition
- *   (vyn-parallax-elements.html): seam and sewing feet at 810 units =
- *   84.7svh, tape-measure ruler ATTACHED to the sheet — LAST, at −6%
- *   REST at PIN 50 (the seam tops the fold ~PIN 0–1 and settles 78.7svh;
- *   the ruler tops the fold ~PIN 5 and rests 94–98.7svh). The planet
- *   sits behind the crest and the drafting circle loses its lower half
- *   en route. Departure sweeps begin as each band lands: the ridge leaves
- *   to −34%, the front band out-travels it to −30% (their departure
- *   completes by PIN 50), burying LINE 1 (sweep ~PIN 18→22).
+ *   the farther as they rise: the glued ridge pair lands ~15, then the
+ *   bands SEPARATE — the distant ridge departs faster to −34%, the front
+ *   band lags to its −30% hold, opening the sky gap between the two
+ *   crest lines — and the sewing world — exactly the reference
+ *   composition (vyn-parallax-elements.html): seam and sewing feet at
+ *   810 units = 84.7svh, tape-measure ruler ATTACHED to the sheet —
+ *   LAST, at −6% REST at PIN 50 (the seam tops the fold ~PIN 0–1 and
+ *   settles 78.7svh; the ruler tops the fold ~PIN 5 and rests
+ *   94–98.7svh). The planet sits behind the crest and the drafting
+ *   circle loses its lower half en route. The glued pair's departure
+ *   sweep buries LINE 1 (sweep ~PIN 18→22).
  * · PHASE 4 · STATEMENT (PIN 50 → 60, inside the hold's opening stretch):
  *   LINE 2 (ink-white, z-40) fades in — no positional motion, one fixed
  *   viewport position — no thread yet, that's the point.
