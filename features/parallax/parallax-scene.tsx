@@ -131,10 +131,10 @@ export function ParallaxScene(): JSX.Element {
          * top). Without scroll-timeline support (or with reduced motion)
          * both render fully visible, stacked (see the px-statement-2
          * fallback rules in globals.css). Note: line 1 additionally sits
-         * 90px ABOVE its 56svh anchor (bottom calc — fixed-pixel shim,
-         * like the 100px gap before the wrapper; dropped 30px from the old
+         * 60px ABOVE its 56svh anchor (bottom calc — fixed-pixel shim,
+         * like the 100px gap before the wrapper; dropped 60px total from the old
          * 120px so the departing ridge swallows the line completely). */}
-        <div className="px-statement-1 absolute inset-x-0 bottom-[calc(56svh+90px)] z-10 flex justify-center px-6">
+        <div className="px-statement-1 absolute inset-x-0 bottom-[calc(56svh+60px)] z-10 flex justify-center px-6">
           <div className="px-statement-inner max-w-xl text-center">
             <h2
               id="parallax-caption"
