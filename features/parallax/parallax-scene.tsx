@@ -146,7 +146,7 @@ export function ParallaxScene(): JSX.Element {
             </h2>
           </div>
         </div>
-        <div className="px-statement-2 absolute inset-x-0 bottom-[calc(41svh-20px)] z-40 flex justify-center px-6">
+        <div className="px-statement-2 absolute inset-x-0 bottom-[calc(41svh+10px)] z-40 flex justify-center px-6">
           <div className="px-statement-inner max-w-xl text-center">
             <h2 className="font-display text-[clamp(1.6rem,3.8vw,2.6rem)] leading-[1.15] font-bold text-balance">
               <span className="px-line2 text-ink block">
