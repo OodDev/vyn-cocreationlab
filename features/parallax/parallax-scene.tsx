@@ -1,5 +1,11 @@
 import type { JSX } from "react";
-import { BackgroundLayer, ForegroundLayer, MidgroundFrontLayer, MidgroundLayer } from "./layer-art";
+import {
+  BackgroundLayer,
+  ForegroundLayer,
+  MidgroundFrontLayer,
+  MidgroundLayer,
+  RocketLayer,
+} from "./layer-art";
 
 /**
  * Pinned parallax transition between the hero and the projects section —
@@ -125,9 +131,10 @@ export function ParallaxScene(): JSX.Element {
          * top). Without scroll-timeline support (or with reduced motion)
          * both render fully visible, stacked (see the px-statement-2
          * fallback rules in globals.css). Note: line 1 additionally sits
-         * 120px ABOVE its 56svh anchor (bottom calc — fixed-pixel shim,
-         * like the 100px gap before the wrapper). */}
-        <div className="px-statement-1 absolute inset-x-0 bottom-[calc(56svh+120px)] z-10 flex justify-center px-6">
+         * 150px ABOVE its 56svh anchor (bottom calc — fixed-pixel shim,
+         * like the 100px gap before the wrapper; pushed down from the old
+         * 120px so the departing ridge swallows the line completely). */}
+        <div className="px-statement-1 absolute inset-x-0 bottom-[calc(56svh+150px)] z-10 flex justify-center px-6">
           <div className="px-statement-inner max-w-xl text-center">
             <h2
               id="parallax-caption"
@@ -146,6 +153,19 @@ export function ParallaxScene(): JSX.Element {
                 Let&rsquo;s weave them to your exact, treasured measure.
               </span>
             </h2>
+          </div>
+        </div>
+        {/* The rocket's OWN layer, z-50 — above the statement text (z-40) so
+         * the launch arc passes IN FRONT of the text. Same viewBox and the
+         * same .px-layer-fg sheet animation as the sewing world: the rocket
+         * rides that sheet through the roll-in and holds locked on the seam
+         * (the fg sheet is static from the hold onward), then departs
+         * through the text on its way out. Without scroll-timeline support
+         * / with reduced motion the .px-layer rules collapse this to a
+         * static copy that sits exactly where the art puts the needle. */}
+        <div className="px-layer px-layer-fg absolute inset-0 w-full z-50">
+          <div className="absolute inset-x-0 -inset-y-[6%]">
+            <RocketLayer />
           </div>
         </div>
       </div>

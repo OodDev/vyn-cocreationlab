@@ -460,44 +460,6 @@ export function ForegroundLayer(): JSX.Element {
         <circle cx="-71.4" cy="-16" r="17" fill={INK} stroke={RIM} strokeWidth="1.6" />
         <circle cx="-71.4" cy="30" r="17" fill={INK} stroke={RIM} strokeWidth="1.6" />
       </g>
-      {/* rocket — the LAUNCH element (PHASE 6): the needle-mast and its
-       * launch flames wrapped in one steerable group; it stands parked on
-       * the seam until the hold nears its end, then ± rotates/tips at its
-       * base, accelerates diagonally (up-left) and scales to FILL the
-       * screen at the release. Choreographed by .px-rocket (globals.css). */}
-      <g data-element="rocket" className="px-rocket">
-        {/* needle — upright mast needle standing ON the seam at (1280,810),
-         * tiny eye at (1280,660): reads as a rocket about to lift off */}
-        <g data-element="needle" transform="translate(1280 810) scale(0.64)">
-          <path
-            d="M 6 0 L 2 -240 L 0 -254 L -3 -240 L -6 0 Z"
-            fill={INK}
-            stroke={RIM}
-            strokeWidth="1.8"
-          />
-          <ellipse
-            cx="0"
-            cy="-234"
-            rx="2.2"
-            ry="3.4"
-            fill="none"
-            stroke={RIM}
-            strokeWidth="1.6"
-          />
-        </g>
-        {/* needleFlames — launch flames below the mast base (m1 nested plume:
-         * F1 silhouette + two stacked inner plumes), 10% smaller */}
-        <g data-element="needleFlames" transform="translate(1280 810) scale(0.9)">
-          <Flickers fill={ORANGE} />
-          <Plume fill={ORANGE} />
-          <g transform="scale(0.72)">
-            <Plume fill={ORANGE_DEEP} />
-          </g>
-          <g transform="scale(0.42)">
-            <Plume fill={ORANGE_MID} />
-          </g>
-        </g>
-      </g>
       {/* buttonOrange — four-hole button, bottom left (79,879) */}
       <g data-element="buttonOrange" transform="translate(79 879)">
         <circle r="30" fill={ORANGE} />
@@ -543,6 +505,65 @@ export function ForegroundLayer(): JSX.Element {
       </g>
       {/* seamless blend into the following section */}
       <rect x="0" y="940" width="1440" height="60" fill="url(#pfg-blend)" />
+    </svg>
+  );
+}
+
+/** The rocket as its OWN layer (PHASE 6 launch): identical art + viewBox to
+ * the sewing world so the needle stands pixel-exact on the seam, but living
+ * in a separate z-50 element above the statement text (z-40) — during the
+ * launch arc the rocket passes IN FRONT of the text. The wrapper in
+ * parallax-scene.tsx carries the same .px-layer-fg sheet animation, so the
+ * rocket rides the sewing world through the roll-in and holds with it
+ * before departing (the fg sheet is static by then, so the two stay locked).
+ * Choreographed by .px-rocket (globals.css). */
+export function RocketLayer(): JSX.Element {
+  return (
+    <svg
+      viewBox="0 0 1440 1000"
+      preserveAspectRatio="xMidYMid slice"
+      className="h-full w-full"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+      focusable="false"
+    >
+      {/* rocket — the needle-mast and its launch flames wrapped in one
+       * steerable group; parked on the seam until the hold nears its end,
+       * then tips at its base, accelerates diagonally (up-left) and scales
+       * to FILL the screen at the release. */}
+      <g data-element="rocket" className="px-rocket">
+        {/* needle — upright mast needle standing ON the seam at (1280,810),
+         * tiny eye at (1280,660): reads as a rocket about to lift off */}
+        <g data-element="needle" transform="translate(1280 810) scale(0.64)">
+          <path
+            d="M 6 0 L 2 -240 L 0 -254 L -3 -240 L -6 0 Z"
+            fill={INK}
+            stroke={RIM}
+            strokeWidth="1.8"
+          />
+          <ellipse
+            cx="0"
+            cy="-234"
+            rx="2.2"
+            ry="3.4"
+            fill="none"
+            stroke={RIM}
+            strokeWidth="1.6"
+          />
+        </g>
+        {/* needleFlames — launch flames below the mast base (m1 nested plume:
+         * F1 silhouette + two stacked inner plumes), 10% smaller */}
+        <g data-element="needleFlames" transform="translate(1280 810) scale(0.9)">
+          <Flickers fill={ORANGE} />
+          <Plume fill={ORANGE} />
+          <g transform="scale(0.72)">
+            <Plume fill={ORANGE_DEEP} />
+          </g>
+          <g transform="scale(0.42)">
+            <Plume fill={ORANGE_MID} />
+          </g>
+        </g>
+      </g>
     </svg>
   );
 }
