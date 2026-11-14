@@ -348,23 +348,18 @@ export function MidgroundFrontLayer(): JSX.Element {
       focusable="false"
       style={{ overflow: "visible" }}
     >
-      {/* mountainsFront — the SAME silhouette as the distant ridge
-       * (MidgroundLayer's path, offset a constant +195 units down): being
-       * a copy of the back profile is what lets the two crest lines
-       * SUPERIMPOSE exactly while glued (px-midfront tracks the mid
-       * translate minus 21.84%) and split apart as the back departs. */}
+      {/* mountainsFront — closer, darker second band in front (crest dropped
+       * ~75 units vs the original art so the band reads SHORTER/lower) */}
       <g data-element="mountainsFront">
         <path
-          d="M 0 835 L 120 735 L 230 805 L 400 665 L 520 795 L 700 695 L 820 835 L 980 715 L 1120 845 L 1260 755 L 1370 835 L 1440 805 L 1440 1620 L 0 1620 Z"
+          d="M 0 765 L 140 685 L 300 755 L 480 665 L 660 745 L 840 675 L 1020 765 L 1200 695 L 1360 775 L 1440 735 L 1440 1620 L 0 1620 Z"
           fill={MOUNT_FRONT}
         />
       </g>
-      {/* mountainFrontPerforation — stitch line along the front crest
-       * (the back ridge's perforation +195: coincides with the back crest
-       * silhouette edge while the bands are glued) */}
+      {/* mountainFrontPerforation — stitch line along the front crest */}
       <g data-element="mountainFrontPerforation">
         <polyline
-          points="0,825 120,725 230,795 400,655 520,785 700,685 820,825 980,705 1120,835 1260,745 1370,825 1440,795"
+          points="0,755 140,675 300,745 480,655 660,735 840,665 1020,755 1200,685 1360,765 1440,725"
           fill="none"
           stroke={STITCH}
           strokeWidth="2.2"

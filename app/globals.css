@@ -260,20 +260,17 @@ body {
       animation-timeline: --pxscene;
       animation-range: cover 12.2% cover 50%;
     }
-    /* NEARER front mountain band: a COPY of the distant ridge's silhouette
-     * (see MidgroundFrontLayer) that starts GLUED to it — crest line lying
-     * exactly on the back ridge's crest line from the scene peek through
-     * the whole roll-in — then separates as the back departs: the back
-     * pulls up to −34%, the front lags behind to its −30% hold. Glue math:
-     * front crest is 195 units (21.84% of the 100svh layer box) below the
-     * back crest at native, so superimposition = front translate =
-     * mid translate − 21.84%. The mid runs +9.5% → 0 over cover
-     * 12.2→30.2 then 0 → −34 over 30.2→50; the front tracks it (same
-     * 12.2→50 window) minus the offset, then eases to −30%. */
+    /* NEARER front mountain band: pushed LATER and more detached from the
+     * first ridge. Starts deeper than the distant ridge and arrives once
+     * the ridge has basically landed (crest enters the fold at PIN −6,
+     * cover 18.5, vs the ridge's PIN −17). Lands still at 20% pin (stop
+     * 46.2% of this range), then departs — held shallower than the old
+     * −45% so the band does NOT swallow most of the viewport during the
+     * still phase — and holds through the still phase. */
     .px-layer-midfront {
       animation: px-midfront linear both;
       animation-timeline: --pxscene;
-      animation-range: cover 12.2% cover 50%;
+      animation-range: cover 18.5% cover 50%;
     }
     .px-layer-fg {
       /* Sewing world (ruler attached): needle tip crosses the fold at
@@ -380,18 +377,19 @@ body {
   }
 }
 
-/* Front band (nearer mountains): glued to the distant ridge — same window
- * as px-mid (cover 12.2→50), translate = mid translate − 21.84% so the
- * two crest lines superimpose exactly: −12.34% while the mid is parked at
- * +9.5%, sliding to −21.84% as the mid lands native at cover 30.2 (still
- * glued), then separating to the −30% hold at cover 50 (the back departs
- * to −34% faster, opening the sky gap between the lines). */
+/* Front band (nearer mountains): crest parked just below the fold (+25.1%
+ * = puts the crest on the fold at PIN −6, cover 18.5, where the range
+ * begins) — it arrives AFTER the distant ridge has basically landed
+ * (more detached start), lands at native 46.2% through the range (= pin
+ * 20, as timed), then departs to −30% (held shallow so the band keeps
+ * most of the lower viewport for the sewing world and statement) and
+ * holds through the still phase. */
 @keyframes px-midfront {
   0% {
-    transform: translate3d(0, -12.34%, 0);
+    transform: translate3d(0, 25.1%, 0);
   }
-  47.6% {
-    transform: translate3d(0, -21.84%, 0);
+  46.2% {
+    transform: translate3d(0, 0, 0);
   }
   100% {
     transform: translate3d(0, -30%, 0);
