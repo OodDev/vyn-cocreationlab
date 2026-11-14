@@ -22,4 +22,4 @@ export const SPLASH_STORE_KEY = "vyn.splash.done";
 /** Flip to true to bring the splashscreen back. */
 export const SPLASH_ENABLED = false;
 
-export const bootFlagsScript: string = `(function(){try{var d=document.documentElement;var rm=window.matchMedia("(prefers-reduced-motion: reduce)").matches;if(!rm){d.setAttribute("data-motion","on")}if(!rm&&!${SPLASH_ENABLED ? "true" : "false"}){d.setAttribute("data-splash","on")}}catch(e){}})();`;
+export const bootFlagsScript: string = `(function(){try{var d=document.documentElement;var rm=window.matchMedia("(prefers-reduced-motion: reduce)").matches;if(!rm){d.setAttribute("data-motion","on")}if(!rm&&${SPLASH_ENABLED}){d.setAttribute("data-splash","on")}}catch(e){}})();`;
