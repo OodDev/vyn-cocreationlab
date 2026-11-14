@@ -349,17 +349,17 @@ export function MidgroundFrontLayer(): JSX.Element {
       style={{ overflow: "visible" }}
     >
       {/* mountainsFront — closer, darker second band in front (crest dropped
-       * ~45 units vs the original art so the band reads SHORTER/lower) */}
+       * ~75 units vs the original art so the band reads SHORTER/lower) */}
       <g data-element="mountainsFront">
         <path
-          d="M 0 735 L 140 655 L 300 725 L 480 635 L 660 715 L 840 645 L 1020 735 L 1200 665 L 1360 745 L 1440 705 L 1440 1620 L 0 1620 Z"
+          d="M 0 765 L 140 685 L 300 755 L 480 665 L 660 745 L 840 675 L 1020 765 L 1200 695 L 1360 775 L 1440 735 L 1440 1620 L 0 1620 Z"
           fill={MOUNT_FRONT}
         />
       </g>
       {/* mountainFrontPerforation — stitch line along the front crest */}
       <g data-element="mountainFrontPerforation">
         <polyline
-          points="0,725 140,645 300,715 480,625 660,705 840,635 1020,725 1200,655 1360,735 1440,695"
+          points="0,755 140,675 300,745 480,655 660,735 840,665 1020,755 1200,685 1360,765 1440,725"
           fill="none"
           stroke={STITCH}
           strokeWidth="2.2"
