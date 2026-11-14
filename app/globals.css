@@ -545,6 +545,9 @@ body {
         grid-template-columns: 100%;
         grid-template-rows: auto 1fr;
         padding-block: clamp(1.25rem, 3vh, 3rem);
+        /* Breathing room at the top of the pinned viewport (the clamp above
+         * only guarantees 1.25–3rem, which hugged the very top edge). */
+        padding-top: clamp(2.25rem, 7vh, 4.5rem);
       }
       .hs-head {
         position: relative;
