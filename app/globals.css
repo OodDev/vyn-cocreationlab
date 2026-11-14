@@ -547,7 +547,7 @@ body {
         padding-block: clamp(1.25rem, 3vh, 3rem);
         /* Breathing room at the top of the pinned viewport (the clamp above
          * only guarantees 1.25–3rem, which hugged the very top edge). */
-        padding-top: clamp(2.25rem, 7vh, 4.5rem);
+        padding-top: clamp(2.25rem, 14vh, 8rem);
       }
       .hs-head {
         position: relative;
