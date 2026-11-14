@@ -538,6 +538,11 @@ body {
         height: 100svh;
         overflow: clip;
         display: grid;
+        /* Explicit 100% column: the track's max-content width (≈3 panels)
+         * must never size the column, or the head (margin-inline auto)
+         * centers itself inside the huge column and lands half off-screen
+         * right — Firefox sizes implicit columns by item min-content. */
+        grid-template-columns: 100%;
         grid-template-rows: auto 1fr;
         padding-block: clamp(1.25rem, 3vh, 3rem);
       }
@@ -561,6 +566,11 @@ body {
         display: flex;
         align-items: center;
         min-height: 0;
+        /* Belt & braces with the 100% column: zero min-width + clip keep
+         * the wide track from inflating this grid item's automatic minimum
+         * size (min-content = track width ≈ 3×88vw). */
+        min-width: 0;
+        overflow: clip;
       }
       .hs-track {
         display: flex;
