@@ -1,10 +1,11 @@
 /**
  * Build-time asset generator (run before `next build`).
  *
- * 1. Pre-optimizes the provided hero artwork (main-bg_UPSCAL.png) into
- *    AVIF + WebP responsive sets (via sharp) — required because static
- *    exports can't use Next's image optimizer. Width sets must match
- *    lib/media.ts.
+ * 1. Pre-optimizes the provided hero artwork (main-bg_transpUPSCAL_PSsharpeFus.png —
+ *    the transparent 5414×2688 "sharpened & fused" upscale; alpha is preserved
+ *    by AVIF/WebP and the page's --color-bg shows through) into AVIF + WebP
+ *    responsive sets (via sharp) — required because static exports can't use
+ *    Next's image optimizer. Width sets must match lib/media.ts.
  * 2. Renders the favicon set + OG fallback PNG from the geometric VYN
  *    letterforms (kept in sync with components/brand/vyn-wordmark.tsx).
  * 3. Generates per-project placeholder "website preview" SVG artwork.
@@ -112,6 +113,121 @@ const ogSvg = `
 </svg>
 `;
 
+/* ── Example material (FICTIONAL, made up for the first card preview) ───────
+ * A bespoke fake "website screenshot" mockup for the example Nordholt entry.
+ * Swap or delete when real screenshots exist — nothing here is a real claim.
+ */
+function nordholtPreviewSvg(): string {
+  return `
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="800" height="500">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0b2a31"/>
+      <stop offset="1" stop-color="#071f26"/>
+    </linearGradient>
+    <linearGradient id="photo" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#123c44"/>
+      <stop offset="1" stop-color="#0a1d22"/>
+    </linearGradient>
+    <linearGradient id="btn" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#4be1ec"/>
+      <stop offset="1" stop-color="#45e083"/>
+    </linearGradient>
+    <linearGradient id="bar" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0" stop-color="#2ba7b3"/>
+      <stop offset="1" stop-color="#4be1ec"/>
+    </linearGradient>
+  </defs>
+
+  <!-- browser window -->
+  <rect width="800" height="500" rx="26" fill="#050d10"/>
+  <g transform="translate(30,28)">
+    <rect width="740" height="444" rx="16" fill="url(#sky)" stroke="#12333a" stroke-width="1.5"/>
+    <rect width="740" height="44" rx="16" fill="#0e2026"/>
+    <rect y="28" width="740" height="16" fill="#0e2026"/>
+    <circle cx="26" cy="22" r="6" fill="#e06d5a"/>
+    <circle cx="48" cy="22" r="6" fill="#e0b45a"/>
+    <circle cx="70" cy="22" r="6" fill="#45e083"/>
+    <rect x="120" y="14" width="330" height="16" rx="8" fill="#0a161a" stroke="#164b53"/>
+    <text x="140" y="26" font-family="monospace" font-size="10" fill="#9db3b8">nordholt-booking.example</text>
+
+    <!-- nav -->
+    <g transform="translate(40,66)">
+      <rect width="18" height="18" rx="5" fill="url(#btn)"/>
+      <text x="28" y="14" font-family="sans-serif" font-weight="700" font-size="14" fill="#e9f4f4" letter-spacing="2">NORDHOLT</text>
+      <g font-family="sans-serif" font-size="11" fill="#9db3b8">
+        <text x="440" y="14">Rooms</text>
+        <text x="505" y="14">Spa</text>
+        <text x="556" y="14">Dining</text>
+        <text x="622" y="14">Contact</text>
+      </g>
+      <rect x="676" y="-4" width="64" height="24" rx="12" fill="url(#btn)" opacity="0.9"/>
+      <text x="690" y="11" font-family="sans-serif" font-weight="700" font-size="10" fill="#04090c">BOOK</text>
+    </g>
+
+    <!-- hero headline -->
+    <g transform="translate(40,112)">
+      <text font-family="sans-serif" font-weight="700" font-size="30" fill="#e9f4f4">Stay above the fjords</text>
+      <text y="22" font-family="sans-serif" font-size="12" fill="#9db3b8">Quiet cabins, sea view and a wood-fired spa — book in under a minute.</text>
+    </g>
+
+    <!-- booking bar -->
+    <g transform="translate(40,170)">
+      <rect width="430" height="46" rx="12" fill="#0f2b31" stroke="#164b53"/>
+      <text x="18" y="20" font-family="sans-serif" font-size="9" fill="#6d868c">CHECK-IN</text>
+      <text x="18" y="36" font-family="sans-serif" font-weight="600" font-size="12" fill="#e9f4f4">Fri 14 May</text>
+      <line x1="118" y1="10" x2="118" y2="36" stroke="#164b53"/>
+      <text x="132" y="20" font-family="sans-serif" font-size="9" fill="#6d868c">CHECK-OUT</text>
+      <text x="132" y="36" font-family="sans-serif" font-weight="600" font-size="12" fill="#e9f4f4">Sun 16 May</text>
+      <line x1="238" y1="10" x2="238" y2="36" stroke="#164b53"/>
+      <text x="252" y="20" font-family="sans-serif" font-size="9" fill="#6d868c">GUESTS</text>
+      <text x="252" y="36" font-family="sans-serif" font-weight="600" font-size="12" fill="#e9f4f4">2 adults</text>
+      <rect x="338" y="8" width="76" height="30" rx="15" fill="url(#btn)"/>
+      <text x="356" y="27" font-family="sans-serif" font-weight="700" font-size="11" fill="#04090c">Search</text>
+    </g>
+
+    <!-- hero "photo" (abstract landscape) -->
+    <g transform="translate(500,100)">
+      <rect width="200" height="140" rx="12" fill="url(#photo)"/>
+      <path d="M0 100 L50 55 L90 88 L130 40 L200 96 L200 140 L0 140 Z" fill="#2bb7c4" opacity="0.55"/>
+      <circle cx="160" cy="30" r="14" fill="#45e083" opacity="0.8"/>
+    </g>
+
+    <!-- room cards -->
+    <g transform="translate(40,244)">
+      ${[0, 1, 2]
+        .map(
+          (i) => `
+      <g transform="translate(${i * 228},0)">
+        <rect width="212" height="150" rx="10" fill="#0f2b31" stroke="#164b53"/>
+        <rect x="12" y="12" width="188" height="64" rx="8" fill="url(#photo)"/>
+        <path d="M12 60 L60 30 L104 56 L150 24 L200 58 L200 76 L12 76 Z" fill="#2bb7c4" opacity="0.4"/>
+        <text x="12" y="98" font-family="sans-serif" font-weight="600" font-size="12" fill="#e9f4f4">${["Fjord Cabin", "Spa Suite", "Sky Loft"][i]}</text>
+        <text x="12" y="116" font-family="sans-serif" font-size="10" fill="#9db3b8">${["2 guests · sea view", "4 guests · private sauna", "2 guests · panorama"][i]}</text>
+        <text x="12" y="138" font-family="sans-serif" font-weight="700" font-size="12" fill="#4be1ec">€${["180", "320", "210"][i]}<tspan fill="#6d868c" font-size="9"> / night</tspan></text>
+        <g fill="#45e083"><text x="164" y="138" font-size="10">★ 4.${[8, 9, 6][i]}</text></g>
+      </g>`,
+        )
+        .join("")}
+    </g>
+
+    <!-- occupancy mini-chart -->
+    <g transform="translate(40,428)">
+      <text font-family="sans-serif" font-size="10" fill="#6d868c">Availability · next 6 weeks</text>
+      <g transform="translate(150,0)">
+        ${[26, 18, 34, 22, 30, 14]
+          .map(
+            (h, i) =>
+              `<rect x="${i * 18}" y="${-h}" width="10" height="${h}" rx="3" fill="url(#bar)" opacity="${0.45 + i * 0.09}"/>`,
+          )
+          .join("")}
+      </g>
+    </g>
+  </g>
+</svg>
+`;
+}
+
 /* Placeholder "website preview" browser mockup per project. */
 function previewSvg(slug: string, index: number, title: string | undefined): string {
   const hueSets = [
@@ -197,16 +313,16 @@ async function write(filePath: string, data: Buffer | string): Promise<void> {
 async function main() {
   /* 1 ─ Hero responsive set */
   const HERO = [
-    { w: 640, h: 360 },
-    { w: 960, h: 540 },
-    { w: 1280, h: 720 },
-    { w: 1600, h: 900 },
-    { w: 1920, h: 1080 },
-    { w: 3200, h: 1800 },
-    { w: 4778, h: 2688 },
+    { w: 640, h: 318 },
+    { w: 960, h: 477 },
+    { w: 1280, h: 636 },
+    { w: 1600, h: 795 },
+    { w: 1920, h: 954 },
+    { w: 3200, h: 1590 },
+    { w: 5414, h: 2688 },
   ];
   for (const { w, h } of HERO) {
-    const base = sharp(join(ROOT, "main-bg_UPSCAL.png")).resize(w, h, { fit: "cover" });
+    const base = sharp(join(ROOT, "main-bg_transpUPSCAL_PSsharpeFus.png")).resize(w, h, { fit: "cover" });
     await write(
       join(PUBLIC_DIR, "images", "hero", `bg-${w}.avif`),
       await base.clone().avif({ quality: 48 }).toBuffer(),
@@ -261,7 +377,10 @@ async function main() {
     if (project === undefined) continue;
     await write(
       join(PUBLIC_DIR, "images", "projects", `preview-${project.slug}.svg`),
-      previewSvg(project.slug, i, project.title),
+      // Example card gets a bespoke (fictional) mockup; others stay generic.
+      project.slug === "ai-assisted-project-01"
+        ? nordholtPreviewSvg()
+        : previewSvg(project.slug, i, project.title),
     );
   }
 }

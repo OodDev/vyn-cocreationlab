@@ -43,13 +43,12 @@ const raw: Array<Project> = [
   // ── Part 1 · AI-assisted projects ─────────────────────────────────────────
   {
     slug: "ai-assisted-project-01",
-    // PLACEHOLDER
-    title: "{{PROJECT TITLE}}",
+    // EXAMPLE CONTENT (fictional, for preview) — replace with real project
+    title: "Nordholt Booking Platform",
     category: "ai-assisted",
-    // PLACEHOLDER
     description:
-      "{{PROJECT DESCRIPTION}} — one or two sentences on what the project does, what was built and the outcome.",
-    stack: ["{{STACK}}"],
+      "A booking platform for a boutique hotel group: room availability, seasonal pricing and a guest dashboard, built at AI speed with human-reviewed code.",
+    stack: ["Next.js", "Postgres", "Tailwind"],
     // liveUrl: "https://…",
     // repoUrl: "https://github.com/OodDev/…",
     startedOn: "2026-01-01",
