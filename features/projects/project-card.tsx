@@ -5,21 +5,24 @@ import { cn } from "@/lib/utils";
 import { type ProjectWithMeta } from "@/content/projects";
 
 /**
- * Card overlay per card-overlay-ref.mp4: the project name always overlays the
- * base art; on hover/focus an website-preview placeholder fades and scales in
- * plus an “Open project” affordance. Entire card is one link (tap-safe,
- * keyboard-activatable). Pure CSS hover — visible without JS.
+ * Card overlay per card-models5.html ("02-rev B · with tech stack badges"):
+ * big centered project title over the original card background (elevated teal
+ * + cyan radial art), 8.8rem ghost index number top-right, dashed stack tags
+ * (only when real stack values exist). On hover/focus the resting text fades
+ * to a whisper and the website-preview mockup takes over. Entire card is one
+ * link (tap-safe, keyboard-activatable). Pure CSS hover — visible without JS.
  */
 export function ProjectCard(props: { project: ProjectWithMeta; index: number }): JSX.Element {
   const { project, index } = props;
   const number: string = String(index + 1).padStart(2, "0");
+  const stack: string[] = project.stack.filter((tool) => !tool.startsWith("{{"));
 
   return (
     <Reveal className="h-full" delay={(index % 2) * 0.08}>
       <a
         href={project.href}
         className={cn(
-          "group rounded-card border-line bg-elev relative flex h-full min-h-[19rem] flex-col overflow-hidden border",
+          "group rounded-card border-line bg-elev relative flex h-full min-h-[19rem] flex-col items-center justify-center overflow-hidden border text-center",
           "hover:border-line-strong hover:shadow-glow transition-[transform,border-color] duration-300 hover:-translate-y-1",
           "focus-visible:border-accent focus-visible:-translate-y-1",
         )}
@@ -40,7 +43,7 @@ export function ProjectCard(props: { project: ProjectWithMeta; index: number }):
         {/* Ghost index number */}
         <span
           aria-hidden="true"
-          className="font-display text-ink/5 absolute -top-9 -right-3 text-[11rem] leading-none font-bold transition-opacity duration-500 select-none group-hover:opacity-60"
+          className="font-display text-ink/5 absolute -top-7 -right-2 text-[8.8rem] leading-none font-bold transition-colors duration-500 select-none group-hover:text-ink/[0.12] group-focus-visible:text-ink/[0.12]"
         >
           {number}
         </span>
@@ -54,27 +57,34 @@ export function ProjectCard(props: { project: ProjectWithMeta; index: number }):
           decoding="async"
           width={800}
           height={500}
-          className={cn(
-            "absolute inset-0 h-full w-full translate-y-4 scale-[1.06] object-cover opacity-0",
-            "transition-[opacity,transform] duration-500 ease-out",
-            "group-hover:translate-y-0 group-hover:scale-100 group-hover:opacity-100",
-            "group-focus-visible:translate-y-0 group-focus-visible:scale-100 group-focus-visible:opacity-100",
-          )}
-        />
-        <div
-          aria-hidden="true"
-          className="from-bg/95 via-bg/55 to-bg/20 absolute inset-0 bg-gradient-to-t opacity-0 transition-opacity duration-500 group-hover:opacity-90 group-focus-visible:opacity-90"
+          className="absolute inset-0 h-full w-full translate-y-4 scale-[1.05] object-cover opacity-0 transition-[opacity,transform] duration-500 ease-out group-hover:translate-y-0 group-hover:scale-100 group-hover:opacity-100 group-focus-visible:translate-y-0 group-focus-visible:scale-100 group-focus-visible:opacity-100"
         />
 
-        {/* Text overlay (always visible, per reference) */}
-        <div className="relative z-10 mt-auto flex flex-col gap-3 p-6 sm:p-7">
-          <span className="rounded-pill border-line-strong text-accent w-fit border px-3 py-1 text-[0.68rem] font-bold tracking-[0.22em] uppercase">
+        {/* Resting text overlay — fades to a whisper while the mock takes over */}
+        <div className="textfade relative z-10 flex flex-col items-center gap-3 px-8 py-6 transition-opacity duration-500 group-hover:opacity-10 group-focus-visible:opacity-10">
+          <span className="rounded-pill border-line-strong text-accent w-fit border px-3 py-1 text-[0.65rem] font-bold tracking-[0.22em] uppercase">
             {project.categoryLabel}
           </span>
-          <span className="font-display text-ink text-xl leading-snug font-semibold sm:text-2xl">
+          <span className="font-display text-ink max-w-[18rem] text-3xl leading-[1.05] font-bold tracking-tight sm:text-[2.6rem]">
             {project.title}
           </span>
-          <span className="text-muted group-hover:text-accent group-focus-visible:text-accent flex items-center gap-2 text-sm font-semibold transition-colors">
+          {stack.length > 0 && (
+            <span className="flex flex-wrap justify-center gap-2">
+              {stack.map((tool) => (
+                <span
+                  key={tool}
+                  className="rounded-[0.3rem] border border-dashed border-accent/35 text-accent px-2 py-0.5 font-mono text-[0.66rem]"
+                >
+                  {tool}
+                </span>
+              ))}
+            </span>
+          )}
+          <span
+            className={cn(
+              "text-muted group-hover:text-accent group-focus-visible:text-accent flex items-center gap-2 text-[0.8rem] font-semibold tracking-[0.1em] uppercase transition-colors",
+            )}
+          >
             {project.isPlaceholder ? "Awaiting project details" : "View case study"}
             <ArrowUpRight
               size={16}
