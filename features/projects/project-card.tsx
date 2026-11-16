@@ -65,8 +65,11 @@ export function ProjectCard(props: { project: ProjectWithMeta; index: number }):
           <span className="rounded-pill border-line-strong text-accent w-fit border px-3 py-1 text-[0.65rem] font-bold tracking-[0.22em] uppercase">
             {project.categoryLabel}
           </span>
-          <span className="font-display text-ink max-w-[18rem] text-2xl leading-[1.1] font-bold tracking-tight sm:text-[2.2rem]">
-            ./{project.title}
+          <span className="text-ink max-w-[18rem] text-[1.55rem] leading-[1.15] tracking-tight sm:text-[1.95rem]">
+            <span className="font-[family-name:var(--font-jetbrains-mono)] font-medium">
+              <span className="text-accent font-bold">./</span>
+              {project.title}
+            </span>
           </span>
           {stack.length > 0 && (
             <span className="flex flex-wrap justify-center gap-2">

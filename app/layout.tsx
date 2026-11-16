@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import type { JSX, ReactNode } from "react";
-import { Manrope, Space_Grotesk } from "next/font/google";
+import { JetBrains_Mono, Manrope, Space_Grotesk } from "next/font/google";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SplashScreen } from "@/components/layout/splash-screen";
 import { bootFlagsScript } from "@/lib/client-flags";
@@ -18,7 +18,8 @@ import "./globals.css";
 
 /*
  * Self-hosted via next/font (downloaded + subset at build, `swap`, preloaded).
- * Two families maximum per the performance brief.
+ * Two families maximum per the performance brief — JetBrains Mono is the
+ * conscious exception: two weights, latin subset only, for project-card titles.
  */
 const displayFont = Space_Grotesk({
   subsets: ["latin"],
@@ -29,6 +30,13 @@ const displayFont = Space_Grotesk({
 const bodyFont = Manrope({
   subsets: ["latin"],
   variable: "--font-manrope",
+  display: "swap",
+});
+
+const monoFont = JetBrains_Mono({
+  subsets: ["latin"],
+  weight: ["500", "700"],
+  variable: "--font-jetbrains-mono",
   display: "swap",
 });
 
@@ -76,7 +84,7 @@ export default function RootLayout(props: { children: ReactNode }): JSX.Element 
   return (
     <html
       lang="en"
-      className={`${displayFont.variable} ${bodyFont.variable}`}
+      className={`${displayFont.variable} ${bodyFont.variable} ${monoFont.variable}`}
       suppressHydrationWarning
     >
       <head>
