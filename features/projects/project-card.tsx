@@ -66,7 +66,7 @@ export function ProjectCard(props: { project: ProjectWithMeta; index: number }):
             {project.categoryLabel}
           </span>
           <span className="font-display text-ink max-w-[18rem] text-3xl leading-[1.05] font-bold tracking-tight sm:text-[2.6rem]">
-            ./&nbsp;{project.title}
+            ./{project.title}
           </span>
           {stack.length > 0 && (
             <span className="flex flex-wrap justify-center gap-2">
