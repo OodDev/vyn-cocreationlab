@@ -99,6 +99,10 @@ export function HeroSection(): JSX.Element {
           >
             <a
               href={mailtoHref()}
+              // TODO(publish): before publishing, confirm the white CTA
+              // (switched from cyan accent for variant testing) is the final
+              // design decision — and that it applies consistently with the
+              // header's "Get in touch" button (still cyan).
               className="rounded-pill bg-white text-bg hover:shadow-glow inline-flex items-center gap-2.5 px-7 py-3.5 font-semibold transition-all hover:-translate-y-0.5"
             >
               Get in touch
