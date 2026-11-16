@@ -3,6 +3,7 @@ import { BrandGithubIcon, BrandLinkedinIcon } from "@/components/brand/brand-ico
 import Link from "next/link";
 import type { JSX } from "react";
 import { VynWordmark } from "@/components/brand/vyn-wordmark";
+import { FundingStrip } from "@/components/layout/funding-strip";
 import { mailtoHref, site } from "@/content/site";
 
 /**
@@ -96,6 +97,8 @@ export function SiteFooter(): JSX.Element {
         </p>
         <p>Last updated {site.lastUpdated}</p>
       </div>
+
+      <FundingStrip />
     </footer>
   );
 }
