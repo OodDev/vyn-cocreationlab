@@ -99,7 +99,7 @@ export function HeroSection(): JSX.Element {
           >
             <a
               href={mailtoHref()}
-              className="rounded-pill bg-accent text-bg hover:shadow-glow inline-flex items-center gap-2.5 px-7 py-3.5 font-semibold transition-all hover:-translate-y-0.5"
+              className="rounded-pill bg-white text-bg hover:shadow-glow inline-flex items-center gap-2.5 px-7 py-3.5 font-semibold transition-all hover:-translate-y-0.5"
             >
               Get in touch
               <ArrowUpRight size={18} aria-hidden="true" />
