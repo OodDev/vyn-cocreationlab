@@ -85,7 +85,7 @@ export function ProjectCard(props: { project: ProjectWithMeta; index: number }):
           )}
           <span
             className={cn(
-              "text-muted group-hover:text-accent group-focus-visible:text-accent flex items-center gap-2 text-[0.8rem] font-semibold tracking-[0.1em] uppercase transition-colors",
+              "text-muted group-hover:text-accent group-focus-visible:text-accent flex items-center gap-2 text-[0.8rem] font-semibold tracking-[0.02em] transition-colors",
             )}
           >
             {project.isPlaceholder ? "Awaiting project details" : "View case study"}
