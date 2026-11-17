@@ -16,7 +16,7 @@ const LOGOS: Array<{ src: string; alt: string; width: number; height: number }> 
 
 export function FundingStrip(): JSX.Element {
   return (
-    <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 bg-white px-6 py-4">
+    <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 bg-white px-6 pt-4 pb-3">
       {LOGOS.map(function (logo, i): JSX.Element {
         return (
           <div key={logo.src} className="flex items-center gap-6">
