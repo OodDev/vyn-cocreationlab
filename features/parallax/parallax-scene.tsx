@@ -141,6 +141,7 @@ export function ParallaxScene(): JSX.Element {
               className="font-display text-[clamp(1.6rem,3.8vw,2.6rem)] leading-[1.15] font-bold text-balance"
             >
               <span className="px-line1 text-ink block">
+                <span className="px-kicker">./VYN — processes</span>
                 Every project starts as uncharted galaxies of ideas.
               </span>
             </h2>
@@ -150,6 +151,7 @@ export function ParallaxScene(): JSX.Element {
           <div className="px-statement-inner max-w-xl text-center">
             <h2 className="font-display text-[clamp(1.6rem,3.8vw,2.6rem)] leading-[1.15] font-bold text-balance">
               <span className="px-line2 text-ink block">
+                <span className="px-kicker">./VYN — processes</span>
                 Let&rsquo;s weave them to your exact, treasured measure.
               </span>
             </h2>
