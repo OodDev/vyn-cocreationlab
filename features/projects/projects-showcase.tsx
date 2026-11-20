@@ -1,6 +1,7 @@
 /**
  * Projects section of the one-page flow: three parts (AI-assisted, CMS,
- * Hand-coded) with two placeholder cards each.
+ * Hand-coded) with two cards each — real case studies where they exist,
+ * clearly marked placeholders elsewhere.
  *
  * On scroll-capable desktops the section becomes a SECOND PINNED SCENE after
  * the parallax release (.hs-* geometry + --hscene timeline in globals.css):
@@ -45,9 +46,8 @@ export function ProjectsShowcase(): JSX.Element {
           </div>
           <Reveal className="text-faint hs-note mt-6 text-sm">
             <p>
-              All six cards currently show marked placeholders. Empty slots intentionally avoid
-              invented claims — real names, links and screenshots land here as the owner fills
-              them in.
+              Cards marked &ldquo;Awaiting project details&rdquo; are deliberately empty — no invented
+              clients, metrics or screenshots ship here. Real work fills them in as it lands.
             </p>
           </Reveal>
         </div>

@@ -15,7 +15,7 @@ export function generateStaticParams(): Array<{ slug: string }> {
     "ai-assisted-project-01",
     "ai-assisted-project-02",
     "cms-project-01",
-    "cms-project-02",
+    "benefuturo",
     "hand-coded-project-01",
     "hand-coded-project-02",
   ].map(function (slug: string): { slug: string } {

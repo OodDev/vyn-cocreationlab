@@ -16,6 +16,8 @@ const projectSchema = z.object({
   category: categorySchema,
   description: z.string().min(1),
   stack: z.array(z.string()).default([]),
+  /** Real website screenshot for the card hover layer (overrides the generated placeholder). */
+  image: z.string().optional(),
   liveUrl: z.string().url().optional(),
   repoUrl: z.string().url().optional(),
   startedOn: z.string().date().optional(),
@@ -74,12 +76,14 @@ const raw: Array<Project> = [
     updatedOn: "2026-10-17",
   },
   {
-    slug: "cms-project-02",
-    title: "{{PROJECT TITLE}}",
+    slug: "benefuturo",
+    title: "Benefuturo",
     category: "cms",
-    description: "{{PROJECT DESCRIPTION}}",
-    stack: ["{{STACK}}"],
-    startedOn: "2026-01-01",
+    description:
+      "Website for Benefuturo, a social-purpose startup designing orientation-education programmes that bridge schools, universities, companies and institutions — a Squarespace build where the team publishes projects, people and news on their own.",
+    stack: ["Squarespace", "CSS", "SEO"],
+    image: "/media/projects/benefuturo.webp",
+    liveUrl: "https://www.benefuturo.it/",
     updatedOn: "2026-10-17",
   },
   // ── Part 3 · Hand-coded projects ─────────────────────────────────────────

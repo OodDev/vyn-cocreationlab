@@ -12,7 +12,7 @@ import { breadcrumbNode, graphToJsonLd, projectNode } from "@/lib/structured-dat
 
 /**
  * Project case-study page — real, crawlable URL per project.
- * Currently placeholder content (marked), structure and schema final.
+ * Unfilled projects render marked placeholder content; structure and schema final.
  * JSON-LD: CreativeWork + BreadcrumbList.
  */
 
@@ -26,7 +26,7 @@ export function generateStaticParams(): Array<{ slug: string }> {
     "ai-assisted-project-01",
     "ai-assisted-project-02",
     "cms-project-01",
-    "cms-project-02",
+    "benefuturo",
     "hand-coded-project-01",
     "hand-coded-project-02",
   ].map(function (slug: string): { slug: string } {
@@ -120,12 +120,14 @@ export default async function ProjectDetailPage(props: ProjectPageProps): Promis
           <div>
             {/* Visible description matches CreativeWork.description exactly */}
             <p className="text-ink/90 text-lg leading-relaxed sm:text-xl">{meta.description}</p>
-            {/* Placeholder case-study body — owner fills later */}
-            <p className="text-faint mt-6 text-sm leading-relaxed">
-              {
-                "{{CASE-STUDY BODY}} — the fuller write-up will go here: brief, approach, stack decisions and outcome. Kept empty on purpose so no fabricated details ship."
-              }
-            </p>
+            {/* Placeholder case-study body — only for projects still awaiting details */}
+            {meta.isPlaceholder ? (
+              <p className="text-faint mt-6 text-sm leading-relaxed">
+                {
+                  "{{CASE-STUDY BODY}} — the fuller write-up will go here: brief, approach, stack decisions and outcome. Kept empty on purpose so no fabricated details ship."
+                }
+              </p>
+            ) : null}
             <p className="mt-8">
               <a
                 href={mailtoHref()}
@@ -159,10 +161,12 @@ export default async function ProjectDetailPage(props: ProjectPageProps): Promis
                   })}
                 </dd>
               </div>
-              <div>
-                <dt className="text-faint">Started</dt>
-                <dd className="text-ink mt-1 font-medium">{meta.startedOn}</dd>
-              </div>
+              {meta.startedOn !== undefined ? (
+                <div>
+                  <dt className="text-faint">Started</dt>
+                  <dd className="text-ink mt-1 font-medium">{meta.startedOn}</dd>
+                </div>
+              ) : null}
               <div>
                 <dt className="text-faint">Links</dt>
                 <dd className="mt-1 space-y-1.5">

@@ -9,7 +9,7 @@
   - `ai-assisted-project-01` (ai-assisted): [case-study page](https://vyn-cocreation.com/projects/ai-assisted-project-01/) · markdown: [ai-assisted-project-01.md](https://vyn-cocreation.com/projects/ai-assisted-project-01.md)
   - `ai-assisted-project-02` (ai-assisted): [case-study page](https://vyn-cocreation.com/projects/ai-assisted-project-02/) · markdown: [ai-assisted-project-02.md](https://vyn-cocreation.com/projects/ai-assisted-project-02.md)
   - `cms-project-01` (cms): [case-study page](https://vyn-cocreation.com/projects/cms-project-01/) · markdown: [cms-project-01.md](https://vyn-cocreation.com/projects/cms-project-01.md)
-  - `cms-project-02` (cms): [case-study page](https://vyn-cocreation.com/projects/cms-project-02/) · markdown: [cms-project-02.md](https://vyn-cocreation.com/projects/cms-project-02.md)
+  - `benefuturo` (cms): [case-study page](https://vyn-cocreation.com/projects/benefuturo/) · markdown: [benefuturo.md](https://vyn-cocreation.com/projects/benefuturo.md)
   - `hand-coded-project-01` (hand-coded): [case-study page](https://vyn-cocreation.com/projects/hand-coded-project-01/) · markdown: [hand-coded-project-01.md](https://vyn-cocreation.com/projects/hand-coded-project-01.md)
   - `hand-coded-project-02` (hand-coded): [case-study page](https://vyn-cocreation.com/projects/hand-coded-project-02/) · markdown: [hand-coded-project-02.md](https://vyn-cocreation.com/projects/hand-coded-project-02.md)
 - [About](https://vyn-cocreation.com/about/): bio, experience, education, profiles. Markdown: [about.md](https://vyn-cocreation.com/about.md)

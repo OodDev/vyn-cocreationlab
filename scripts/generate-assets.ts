@@ -375,6 +375,8 @@ async function main() {
   for (let i = 0; i < projects.length; i += 1) {
     const project = projects[i];
     if (project === undefined) continue;
+    // Real screenshots (project.image) are authored assets — never overwrite them.
+    if (project.image !== undefined) continue;
     await write(
       join(PUBLIC_DIR, "images", "projects", `preview-${project.slug}.svg`),
       // Example card gets a bespoke (fictional) mockup; others stay generic.

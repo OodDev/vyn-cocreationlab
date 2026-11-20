@@ -48,9 +48,9 @@ export function ProjectCard(props: { project: ProjectWithMeta; index: number }):
           {number}
         </span>
 
-        {/* Hover layer: website preview placeholder (fades + scales in) */}
+        {/* Hover layer: real screenshot when supplied, generated placeholder otherwise */}
         <img
-          src={`/images/projects/preview-${project.slug}.svg`}
+          src={project.image ?? `/images/projects/preview-${project.slug}.svg`}
           alt=""
           aria-hidden="true"
           loading="lazy"

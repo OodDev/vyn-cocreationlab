@@ -58,7 +58,7 @@ export default function ProjectsIndexPage(): JSX.Element {
             Projects
           </h1>
           <p className="text-muted mt-5 max-w-2xl text-lg">
-            {`Three parts, one standard: ${allProjectsWithMeta.length} case-study pages currently ship as clearly marked placeholders — every card below opens a real, crawlable URL.`}
+            {`Three parts, one standard: ${allProjectsWithMeta.length} case-study pages, each on a real, crawlable URL.`}
           </p>
         </Reveal>
 
