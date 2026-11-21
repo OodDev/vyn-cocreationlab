@@ -30,15 +30,31 @@ async function write(filePath: string, data: string): Promise<void> {
 }
 
 function projectMdn(project: Project): string {
+  const specs: string = (project.caseStudy?.specs ?? [])
+    .map(function (spec): string {
+      return `- ${spec.label}: ${spec.value}`;
+    })
+    .join("\n");
+  const sections: string = (project.caseStudy?.sections ?? [])
+    .map(function (section): string {
+      const paragraphs: string = section.body.join("\n\n");
+      const points: string = (section.points ?? [])
+        .map(function (point): string {
+          return `- ${point}`;
+        })
+        .join("\n");
+      return `## ${section.title}\n\n${paragraphs}${points === "" ? "" : `\n\n${points}`}`;
+    })
+    .join("\n\n");
   return `# ${project.title}
 
 Category: ${project.category} · updated ${project.updatedOn ?? site.lastUpdated}
 
 ${project.description}
 
-Stack: ${project.stack.join(", ")}
+Stack: ${project.stack.join(", ")}${specs === "" ? "" : `\n\nSpecs:\n${specs}`}
 
-Links: [live](${project.liveUrl ?? "pending"}) · [repo](${project.repoUrl ?? "pending"}) · [HTML page](${SITE_URL}/projects/${project.slug}/)
+Links: [live](${project.liveUrl ?? "pending"}) · [repo](${project.repoUrl ?? "pending"}) · [HTML page](${SITE_URL}/projects/${project.slug}/)${sections === "" ? "" : `\n\n${sections}`}
 `;
 }
 

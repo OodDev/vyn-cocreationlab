@@ -120,8 +120,37 @@ export default async function ProjectDetailPage(props: ProjectPageProps): Promis
           <div>
             {/* Visible description matches CreativeWork.description exactly */}
             <p className="text-ink/90 text-lg leading-relaxed sm:text-xl">{meta.description}</p>
-            {/* Placeholder case-study body — only for projects still awaiting details */}
-            {meta.isPlaceholder ? (
+            {meta.caseStudy !== undefined ? (
+              meta.caseStudy.sections.map(function (section): JSX.Element {
+                return (
+                  <section key={section.title} className="mt-10">
+                    <h2 className="font-display text-ink text-2xl font-semibold">{section.title}</h2>
+                    {section.body.map(function (paragraph): JSX.Element {
+                      return (
+                        <p key={paragraph} className="text-muted mt-4 leading-relaxed">
+                          {paragraph}
+                        </p>
+                      );
+                    })}
+                    {section.points !== undefined && section.points.length > 0 ? (
+                      <ul className="text-muted mt-4 space-y-2.5 leading-relaxed">
+                        {section.points.map(function (point): JSX.Element {
+                          return (
+                            <li key={point} className="flex gap-3">
+                              <span aria-hidden="true" className="text-accent-2 mt-2 shrink-0 text-xs">
+                                ▸
+                              </span>
+                              <span>{point}</span>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    ) : null}
+                  </section>
+                );
+              })
+            ) : meta.isPlaceholder ? (
+              /* Placeholder case-study body — only for projects still awaiting details */
               <p className="text-faint mt-6 text-sm leading-relaxed">
                 {
                   "{{CASE-STUDY BODY}} — the fuller write-up will go here: brief, approach, stack decisions and outcome. Kept empty on purpose so no fabricated details ship."
@@ -161,6 +190,14 @@ export default async function ProjectDetailPage(props: ProjectPageProps): Promis
                   })}
                 </dd>
               </div>
+              {meta.caseStudy?.specs.map(function (spec): JSX.Element {
+                return (
+                  <div key={spec.label}>
+                    <dt className="text-faint">{spec.label}</dt>
+                    <dd className="text-ink mt-1 font-medium">{spec.value}</dd>
+                  </div>
+                );
+              })}
               {meta.startedOn !== undefined ? (
                 <div>
                   <dt className="text-faint">Started</dt>
@@ -195,6 +232,40 @@ export default async function ProjectDetailPage(props: ProjectPageProps): Promis
           </aside>
         </Reveal>
 
+        {meta.caseStudy !== undefined && meta.caseStudy.gallery.length > 0 ? (
+          <section aria-labelledby="project-screens" className="mt-16">
+            <Reveal>
+              <h2 id="project-screens" className="kicker text-accent-2">
+                Screens
+              </h2>
+            </Reveal>
+            <ul className="mt-6 grid gap-6 sm:grid-cols-2">
+              {meta.caseStudy.gallery.map(function (shot, index): JSX.Element {
+                return (
+                  <li key={shot.src}>
+                    <Reveal delay={(index % 2) * 0.08}>
+                      <figure>
+                        <img
+                          src={shot.src}
+                          alt={shot.alt}
+                          width={1440}
+                          height={900}
+                          loading="lazy"
+                          decoding="async"
+                          className="rounded-card border-line bg-surface w-full border"
+                        />
+                        {shot.caption !== undefined ? (
+                          <figcaption className="text-faint mt-3 text-sm">{shot.caption}</figcaption>
+                        ) : null}
+                      </figure>
+                    </Reveal>
+                  </li>
+                );
+              })}
+            </ul>
+          </section>
+        ) : null}
+
         {/* Internal linking between related projects (descriptive anchors) */}
         <section
           aria-labelledby="related-projects"
@@ -211,7 +282,7 @@ export default async function ProjectDetailPage(props: ProjectPageProps): Promis
                     href={entry.project.href}
                     className="group rounded-card border-line bg-elev hover:border-line-strong hover:shadow-glow block border p-5 transition-all hover:-translate-y-0.5"
                   >
-                    <span className="text-faint block text-xs font-bold tracking-[0.2em] uppercase">
+                    <span className="text-muted block text-xs font-bold tracking-[0.2em] uppercase">
                       {entry.reason === "same-category"
                         ? `More ${categoryHeading.toLowerCase()}`
                         : "Different approach"}

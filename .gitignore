@@ -29,6 +29,11 @@ tsconfig.tsbuildinfo
 !/main-bg_UPSCAL.png
 /*.jpg
 /public/og
+/ColourPalette/
+/hero-variants-shots/
+/parallax-shots/
+/px-text-shots/
+/main-bg_transpUPSCAL.psd
 
 # personal notes
 /Bio.txt
