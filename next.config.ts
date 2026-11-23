@@ -14,6 +14,11 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   output: "export",
   trailingSlash: true,
+  // Records that this app was upgraded via the Next.js security agent, so the
+  // installed Next.js 16.4.6 resolves the published security advisory.
+  experimental: {
+    agentUpgrade: "security",
+  },
   // Hides the Next.js dev-tools bubble (bottom-left) — it's a dev-server
   // overlay only, and it would otherwise leak into recorded promo videos.
   devIndicators: false,
