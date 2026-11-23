@@ -5,7 +5,6 @@ import { SmartImage } from "@/components/media/smart-image";
 import { mailtoHref, site } from "@/content/site";
 import { HERO_SIZES, heroImage } from "@/lib/media";
 import { RotatingRole } from "@/features/hero/rotating-role";
-import { ScrambleText } from "@/features/hero/scramble-text";
 
 /**
  * Hero — exactly 100svh of the provided artwork with the identity block on
@@ -62,15 +61,13 @@ export function HeroSection(): JSX.Element {
               className="hero-enter text-glow block text-[clamp(3.6rem,11vw,8.25rem)] tracking-[0.04em]"
               style={{ "--enter-delay": "0.12s" } as CSSProperties}
             >
-              {/* Scramble starts with the entrance (0.12s after the splash
-               * leaves, or page load without one) — resolves on-camera. */}
-              <ScrambleText text="VYN" startDelayMs={120} />
+              VYN
             </span>
             <span
               className="hero-enter text-ink block text-[clamp(1.45rem,3.4vw,2.5rem)] font-medium tracking-[0.02em]"
               style={{ "--enter-delay": "0.26s" } as CSSProperties}
             >
-              <ScrambleText text="CoCreation Lab" startDelayMs={260} />
+              CoCreation Lab
             </span>
           </h1>
 

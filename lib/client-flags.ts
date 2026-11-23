@@ -11,8 +11,8 @@
  *   full page load/reload, not just first visit).
  *
  * The splash machinery (SplashScreen, rotating-role's splash wait, the
- * hero titles' splash-aware scramble start, the html[data-splash] CSS) is
- * always in place; only the flag below gates the overlay itself.
+ * html[data-splash] CSS) is always in place; only the flag below gates the
+ * overlay itself.
  */
 export const MOTION_FLAG_ATTR = "data-motion";
 export const SPLASH_FLAG_ATTR = "data-splash";
