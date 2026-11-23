@@ -2,6 +2,7 @@
 
 import { useEffect, useState, type JSX } from "react";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
+import { SPLASH_FLAG_ATTR } from "@/lib/client-flags";
 
 /**
  * Scramble-in effect for the hero name on first page load, in the spirit of
@@ -13,6 +14,11 @@ import { useReducedMotion } from "@/hooks/use-reduced-motion";
  * mismatch and the page starts scrambled exactly like the reference site.
  * A visually hidden copy of the real text is always present for screen
  * readers and crawlers. Reduced-motion users get the final text immediately.
+ *
+ * Splash-aware: while the splash overlay is up (`data-splash="on"`), the
+ * scramble holds its placeholders and only starts counting once the flag is
+ * removed (same contract as RotatingRole) — so the resolve always happens
+ * ON CAMERA, whether or not the splash is enabled.
  */
 
 /** Deterministic first-paint placeholder pool (pure CJK glyphs like the ref). */
@@ -27,6 +33,9 @@ const TICK_MS = 50;
 const HOLD_TICKS = 2;
 /** Ticks until each successive character (left-to-right) resolves. */
 const RESOLVE_TICKS = 2;
+/** Fallback start beat in case the splash flag never gets removed while
+ * this component is mounted (~ splash GONE_AT_MS = 5370 + small buffer). */
+const SPLASH_GONE_FALLBACK_MS = 5450;
 
 /** Total timeline duration of the scramble for a text of N chars (ms). */
 export function scrambleDurationMs(length: number, speed: number = 1): number {
@@ -66,31 +75,62 @@ export function ScrambleText(props: ScrambleTextProps): JSX.Element {
 
     let tick = 0;
     let intervalId = 0;
-    const timeoutId = window.setTimeout(function startScramble(): void {
-      intervalId = window.setInterval(function tickScramble(): void {
-        tick += 1;
-        const total = HOLD_TICKS + Math.ceil(text.length / RESOLVE_TICKS) * RESOLVE_TICKS;
-        if (tick >= total) {
-          window.clearInterval(intervalId);
-          setDisplay(text);
-          return;
+    let timeoutId = 0;
+    let fallbackId = 0;
+    let began = false;
+    let observer: MutationObserver | undefined;
+
+    const begin = (): void => {
+      if (began) return;
+      began = true;
+      observer?.disconnect();
+      window.clearTimeout(fallbackId);
+      timeoutId = window.setTimeout(function startScramble(): void {
+        intervalId = window.setInterval(function tickScramble(): void {
+          tick += 1;
+          const total = HOLD_TICKS + Math.ceil(text.length / RESOLVE_TICKS) * RESOLVE_TICKS;
+          if (tick >= total) {
+            window.clearInterval(intervalId);
+            setDisplay(text);
+            return;
+          }
+          const resolved = Math.floor((tick - HOLD_TICKS) / RESOLVE_TICKS);
+          setDisplay(
+            text
+              .split("")
+              .map(function pick(ch: string, i: number): string {
+                if (i < resolved || ch === " ") return ch;
+                return POOL[Math.floor(Math.random() * POOL.length)] ?? "?";
+              })
+              .join(""),
+          );
+        }, Math.round(TICK_MS / speed));
+      }, startDelayMs);
+    };
+
+    const root: HTMLElement = document.documentElement;
+    if (root.getAttribute(SPLASH_FLAG_ATTR) === "on") {
+      // Splash up: start the countdown only when the overlay actually
+      // leaves (authoritative teardown signal, see SplashScreen).
+      observer = new MutationObserver(function onSplashFlagRemoved(): void {
+        if (root.getAttribute(SPLASH_FLAG_ATTR) !== "on") {
+          begin();
         }
-        const resolved = Math.floor((tick - HOLD_TICKS) / RESOLVE_TICKS);
-        setDisplay(
-          text
-            .split("")
-            .map(function pick(ch: string, i: number): string {
-              if (i < resolved || ch === " ") return ch;
-              return POOL[Math.floor(Math.random() * POOL.length)] ?? "?";
-            })
-            .join(""),
-        );
-      }, Math.round(TICK_MS / speed));
-    }, startDelayMs);
+      });
+      observer.observe(root, {
+        attributes: true,
+        attributeFilter: [SPLASH_FLAG_ATTR],
+      });
+      fallbackId = window.setTimeout(begin, SPLASH_GONE_FALLBACK_MS);
+    } else {
+      begin();
+    }
 
     return function stopScramble(): void {
       window.clearTimeout(timeoutId);
+      window.clearTimeout(fallbackId);
       window.clearInterval(intervalId);
+      observer?.disconnect();
     };
   }, [text, startDelayMs, speed, reducedMotion]);
 

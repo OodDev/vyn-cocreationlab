@@ -62,8 +62,8 @@ export function HeroSection(): JSX.Element {
               className="hero-enter text-glow block text-[clamp(3.6rem,11vw,8.25rem)] tracking-[0.04em]"
               style={{ "--enter-delay": "0.12s" } as CSSProperties}
             >
-              {/* Scramble starts with the entrance (0.12s), not after a
-               * splash-era hold — the CJK placeholders resolve on-camera. */}
+              {/* Scramble starts with the entrance (0.12s after the splash
+               * leaves, or page load without one) — resolves on-camera. */}
               <ScrambleText text="VYN" startDelayMs={120} />
             </span>
             <span
