@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, type JSX } from "react";
+import { useReducedMotion } from "@/hooks/use-reduced-motion";
 
 /**
  * Scramble-in effect for the hero name on first page load, in the spirit of
@@ -21,8 +22,9 @@ const PLACEHOLDER = "火水金土木日月生龍夢光流雲風影生火土水";
 const POOL = "一丁丄乂氷木火土金水日月生龍夢光流雲風影AELOSX#+*<>/";
 
 const TICK_MS = 50;
-/** Ticks of pure scramble before real characters start resolving. */
-const HOLD_TICKS = 6;
+/** Ticks of pure scramble before real characters start resolving (kept
+ * short so the placeholders never linger once the page is on screen). */
+const HOLD_TICKS = 2;
 /** Ticks until each successive character (left-to-right) resolves. */
 const RESOLVE_TICKS = 2;
 
@@ -53,12 +55,12 @@ interface ScrambleTextProps {
 
 export function ScrambleText(props: ScrambleTextProps): JSX.Element {
   const { text, startDelayMs = 0, speed = 1 } = props;
+  const reducedMotion: boolean = useReducedMotion();
   // Deterministic placeholder → identical markup on server and hydration.
   const [display, setDisplay] = useState<string>(() => placeholderFor(text));
 
   useEffect(function scrambleIn(): (() => void) | undefined {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      setDisplay(text);
+    if (reducedMotion) {
       return undefined;
     }
 
@@ -90,11 +92,11 @@ export function ScrambleText(props: ScrambleTextProps): JSX.Element {
       window.clearTimeout(timeoutId);
       window.clearInterval(intervalId);
     };
-  }, [text, startDelayMs, speed]);
+  }, [text, startDelayMs, speed, reducedMotion]);
 
   return (
     <>
-      <span aria-hidden="true">{display}</span>
+      <span aria-hidden="true">{reducedMotion ? text : display}</span>
       {/* Stable copy of the real text for screen readers + crawlers. */}
       <span className="sr-only">{text}</span>
     </>

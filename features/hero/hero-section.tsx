@@ -62,13 +62,15 @@ export function HeroSection(): JSX.Element {
               className="hero-enter text-glow block text-[clamp(3.6rem,11vw,8.25rem)] tracking-[0.04em]"
               style={{ "--enter-delay": "0.12s" } as CSSProperties}
             >
-              <ScrambleText text="VYN" startDelayMs={2400} />
+              {/* Scramble starts with the entrance (0.12s), not after a
+               * splash-era hold — the CJK placeholders resolve on-camera. */}
+              <ScrambleText text="VYN" startDelayMs={120} />
             </span>
             <span
               className="hero-enter text-ink block text-[clamp(1.45rem,3.4vw,2.5rem)] font-medium tracking-[0.02em]"
               style={{ "--enter-delay": "0.26s" } as CSSProperties}
             >
-              <ScrambleText text="CoCreation Lab" startDelayMs={2620} />
+              <ScrambleText text="CoCreation Lab" startDelayMs={260} />
             </span>
           </h1>
 

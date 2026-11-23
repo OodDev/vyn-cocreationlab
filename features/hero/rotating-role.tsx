@@ -2,6 +2,7 @@
 
 import { useEffect, useState, type JSX } from "react";
 import { ScrambleText, scrambleDurationMs } from "@/features/hero/scramble-text";
+import { useReducedMotion } from "@/hooks/use-reduced-motion";
 
 /**
  * Rotating hero role label: "Web Developing" → "Photography" → "Drone".
@@ -37,7 +38,7 @@ const FIRST_RUN_SPEED = 0.75;
 
 export function RotatingRole(): JSX.Element {
   const [index, setIndex] = useState<number>(0);
-  const [reduced, setReduced] = useState<boolean>(false);
+  const reduced: boolean = useReducedMotion();
   const [started, setStarted] = useState<boolean>(false);
   // The very first slot (initial "Web Developing") runs at FIRST_RUN_SPEED;
   // every later appearance of the same role uses its normal per-role speed.
@@ -54,9 +55,7 @@ export function RotatingRole(): JSX.Element {
   // case where the flag is never set (e.g. reduced motion already handled
   // above, but a flag-less load can also occur after a skip-less teardown).
   useEffect(function beginWhenSplashLeaves(): (() => void) | undefined {
-    const query = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setReduced(query.matches);
-    if (query.matches) {
+    if (reduced) {
       return undefined;
     }
 
@@ -97,7 +96,7 @@ export function RotatingRole(): JSX.Element {
       window.clearTimeout(fallbackId);
       observer.disconnect();
     };
-  }, []);
+  }, [reduced]);
 
   // Schedule the next slot AFTER the current word fully resolves, so the
   // resolved word is on screen for STAY_MS (slot = scramble + stay).
