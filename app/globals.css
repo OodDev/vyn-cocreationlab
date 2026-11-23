@@ -224,16 +224,20 @@ body {
  *   50→75 (cover 50→64.1), tail out of the eye, curling to the ground
  *   pin 75→88 (cover 64.1→71.5 — done BEFORE the launch; the world then
  *   holds a quiet beat, pin 88→92, as the scroll keeps going).
- * · P5 LAUNCH (PIN 92 → 100): the needle+flames rocket — parked on the
- *   seam all along — tips at its base and ARCS diagonally up-left through
- *   the screen centre while zooming to 40× (variant D of
- *   rocket-takeoff-variants.html): the zoom sweeps it fully past the
- *   viewport corner — no fade — gone at the release.
+ * · P5 LAUNCH + DEPARTURE (PIN 92 → past 100): the needle+flames rocket —
+ *   parked on the seam all along — tips at its base and ARCS diagonally
+ *   up-left through the screen centre while zooming to 56× (variant D of
+ *   rocket-takeoff-variants.html). It rides its OWN departure sticky
+ *   (.px-rocket-depart, z-60) that stays viewport-pinned to the wrapper
+ *   bottom (cover 100) and paints ABOVE the projects section, so the zoom
+ *   keeps sweeping it fully off-screen (transform only, no fade) IN FRONT
+ *   of the projects as they scroll up into view — gone before the projects
+ *   pin (cover 100) and the horizontal act (cover ~98 of --pxscene).
  * · P6 RELEASE (pin 100): the frame exits; the sewing world holds at its
- *   −6% rest (the rocket already departed), ruler strip the
- *   bottom datum, blend gradient reaching the contact line, as the
- *   projects section scrolls over. Reduced motion
- *   / no support: static scene below (rules follow).
+ *   −6% rest, ruler strip the bottom datum, blend gradient reaching the
+ *   contact line, as the projects section scrolls over. The rocket's
+ *   departure layer stays pinned through this window (see P5). Reduced
+ *   motion / no support: static scene below (rules follow).
  * Artwork: "Paper Seams" (see features/parallax/layer-art.tsx). */
 @supports (animation-timeline: view()) and (animation-range: normal normal) {
   @media (prefers-reduced-motion: no-preference) {
@@ -333,18 +337,23 @@ body {
       animation-range: cover 64.1% cover 71.5%;
     }
     .px-rocket {
-      /* PHASE 6 — LAUNCH (variant "D · Arc into centre", adapted): the
-       * rocket group parks on the seam through every earlier phase
-       * (fill both) — INCLUDING the beat of stillness after the thread
-       * completes (thread done at PIN 88, quiet 88→92) — then from PIN 92:
-       * tips at its base and ARCS up-left along its one path, GROWING so
-       * much it covers most of the scene — until the zoom sweeps it right
-       * past the viewport edge, fully OFF-SCREEN (transform only, NO fade)
-       * by the release (PIN 100). transform-origin is the rocket's base on
-       * the seam (1280,810 user units). */
+      /* PHASE 6 — LAUNCH + DEPARTURE (variant "D · Arc into centre",
+       * adapted): the rocket group parks on the seam through every earlier
+       * phase (fill both) — INCLUDING the beat of stillness after the
+       * thread completes (thread done at PIN 88, quiet 88→92) — then from
+       * PIN 92 tips at its base and ARCS up-left along its one path, GROWING
+       * so much it covers most of the scene. The range now runs PAST the
+       * release (PIN 100 = cover 78.3) to cover 98%: the rocket lives in its
+       * own departure sticky (.px-rocket-depart) that stays viewport-pinned
+       * to the wrapper bottom (cover 100) and paints ABOVE the projects
+       * section, so it keeps flying IN FRONT of the projects while they
+       * scroll up into view — and is fully OFF-SCREEN (transform only, NO
+       * fade) before the projects pin (cover 100) and well before the
+       * horizontal act starts. transform-origin is the rocket's base on the
+       * seam (1280,810 user units). */
       animation: px-rocket linear both;
       animation-timeline: --pxscene;
-      animation-range: cover 73.7% cover 78.2%;
+      animation-range: cover 73.7% cover 98%;
       transform-origin: 1280px 810px;
       transform-box: view-box;
     }
@@ -454,16 +463,17 @@ body {
   }
 }
 
-/* Rocket launch (PHASE 6 — variant D "arc into centre", from
- * rocket-takeoff-variants.html, adapted per review): parked until PIN 88,
+/* Rocket launch + departure (PHASE 6 — variant D "arc into centre", from
+ * rocket-takeoff-variants.html, adapted per review): parked until PIN 92,
  * tips at the base (-10°→-14°→-16°), arcs up-left through the screen
- * centre while ZOOMING 1.3× → 4× → 30× → 40× — the zoom sweeps the rocket
- * completely off-screen by PIN 100 (transform only, NO fade-out).
- * Stop list now every segment diagonal (no sideways jog): 0/0.26/0.60/1
- * windowed over cover 73.7→78.2 (= PIN 92→100, after the thread + the
- * quiet beat); the scale growth covers most of the scene — 1.6× → 12× →
- * 56× — and the last stop pushes the body fully past the top-left
- * corner. */
+ * centre while ZOOMING 1.6× → 12× → 56× — the zoom sweeps the rocket
+ * completely off-screen (transform only, NO fade-out). The range is
+ * windowed over cover 73.7→98 (= PIN 92 → just before the projects pin):
+ * the launch begins in the pinned scene, then the rocket — riding its own
+ * departure sticky that stays viewport-locked past the release — keeps
+ * crossing IN FRONT of the projects section as it scrolls up into view,
+ * fully gone before the horizontal act begins. Stop list every segment
+ * diagonal (no sideways jog): 0/0.26/0.60/1. */
 @keyframes px-rocket {
   0% {
     transform: rotate(0deg) translate3d(0, 0, 0) scale(1);
@@ -497,6 +507,20 @@ body {
   }
   .px-sticky {
     position: static !important;
+    height: 80svh !important;
+  }
+  /* The rocket departure layer collapses to a static overlay on the 80svh
+   * scene (absolute, so it adds no flow height and coincides with the
+   * static .px-sticky art) — the needle parks exactly where the art puts
+   * it, no launch. */
+  .px-rocket-depart {
+    position: absolute !important;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 80svh !important;
+  }
+  .px-rocket-viewport {
     height: 80svh !important;
   }
   /* Statement heads stack statically (line 1 at bottom-56svh, line 2

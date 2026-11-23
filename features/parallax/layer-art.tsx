@@ -516,13 +516,14 @@ export function ForegroundLayer(): JSX.Element {
   );
 }
 
-/** The rocket as its OWN layer (PHASE 6 launch): identical art + viewBox to
- * the sewing world so the needle stands pixel-exact on the seam, but living
- * in a separate z-50 element above the statement text (z-40) — during the
- * launch arc the rocket passes IN FRONT of the text. The wrapper in
- * parallax-scene.tsx carries the same .px-layer-fg sheet animation, so the
- * rocket rides the sewing world through the roll-in and holds with it
- * before departing (the fg sheet is static by then, so the two stay locked).
+/** The rocket as its OWN layer (PHASE 6 launch + departure): identical art
+ * + viewBox to the sewing world so the needle stands pixel-exact on the
+ * seam. It lives in a dedicated departure sticky (.px-rocket-depart, z-60)
+ * lifted OUT of .px-sticky in parallax-scene.tsx — above the statement text
+ * and, crucially, above the projects section, and viewport-pinned past the
+ * release so the launch arc passes IN FRONT of the incoming projects. The
+ * sheet carries the same .px-layer-fg animation as the sewing world, so the
+ * rocket rides it through the roll-in and holds with it before departing.
  * Choreographed by .px-rocket (globals.css). */
 export function RocketLayer(): JSX.Element {
   return (

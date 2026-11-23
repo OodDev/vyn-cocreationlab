@@ -66,18 +66,23 @@ import {
  *   needle eye at PIN 50→75, then falls out of the eye and curls to the
  *   ground at PIN 75→88 — completing BEFORE the launch — and the world
  *   holds one quiet beat of scrolling (PIN 88→92).
- * · PHASE 6 · LAUNCH (PIN 92 → 100): the needle+flames rocket — parked
- *   on the seam through six phases — tips at its base and ARCS
- *   diagonally up-left through the screen centre while zooming to 40×
+ * · PHASE 6 · LAUNCH + DEPARTURE (PIN 92 → past 100): the needle+flames
+ *   rocket — parked on the seam through six phases — tips at its base and
+ *   ARCS diagonally up-left through the screen centre while zooming to 56×
  *   (the "D · Arc into centre" variant of rocket-takeoff-variants.html,
- *   adapted): the zoom sweeps it completely off-screen — no fade — by
- *   the release.
+ *   adapted). It lives in its OWN departure sticky (.px-rocket-depart,
+ *   z-60) lifted out of .px-sticky: that zero-height sibling stays
+ *   viewport-pinned to the wrapper bottom (cover 100%) and paints ABOVE the
+ *   projects section, so the zoom keeps sweeping the rocket off-screen
+ *   (transform only, no fade) IN FRONT of the projects as they scroll up
+ *   into view — fully gone before the projects pin and the horizontal act.
  * · PHASE 7 · RELEASE (PIN 100 +): the frame exits upward: bg holds its
  *   −16% drift, mid −34%, midfront −30% already parked — the sewing
- *   world holds at its −6% rest (the rocket already departed;
- *   ruler strip as the bottom datum) while
+ *   world holds at its −6% rest (ruler strip as the bottom datum) while
  *   the projects section scrolls in below, its blend gradient landing
- *   exactly at the contact line. Artwork: "Paper Seams" (layer-art.tsx).
+ *   exactly at the contact line. The rocket's departure layer stays pinned
+ *   through this window (see PHASE 6) so the flight overlaps the incoming
+ *   projects. Artwork: "Paper Seams" (layer-art.tsx).
  *
  * Each layer's inner box is overscanned -6% vertically: the 1440×1000 canvas
  * is taller than the viewport, so slice-fitting into a slightly taller box
@@ -92,6 +97,30 @@ export function ParallaxScene(): JSX.Element {
       data-section="projects-intro"
       className="px-scene relative mt-[100px] h-[360svh]"
     >
+      {/* The rocket's OWN departure layer — lifted OUT of .px-sticky so it is
+       * not clipped or carried away when the scene releases. A zero-height
+       * sticky sibling adds no flow height (it coincides with .px-sticky
+       * through the roll-in and the pin) but keeps its 100svh viewport box
+       * stuck to the top ALL THE WAY to the wrapper bottom (cover 100%),
+       * i.e. through the whole release window while the projects section
+       * scrolls up underneath. z-[60] puts it ABOVE the projects section, so
+       * the launch arc passes IN FRONT of the incoming projects and only
+       * fully leaves the frame before the horizontal act begins. The inner
+       * box re-creates the viewport clip (overflow-hidden) and is
+       * pointer-events-none so the projects cards beneath stay clickable.
+       * The sheet rides the same .px-layer-fg animation as the sewing world
+       * (roll-in + hold), then .px-rocket flies the group off-screen.
+       * Reduced motion / no support: see the .px-rocket-depart fallbacks in
+       * globals.css (the box collapses to a static overlay). */}
+      <div className="px-rocket-depart sticky top-0 z-[60] h-0">
+        <div className="px-rocket-viewport relative h-[100svh] overflow-hidden pointer-events-none">
+          <div className="px-layer px-layer-fg absolute inset-0 w-full">
+            <div className="absolute inset-x-0 -inset-y-[6%]">
+              <RocketLayer />
+            </div>
+          </div>
+        </div>
+      </div>
       <div className="px-sticky sticky top-0 h-[100svh] overflow-hidden">
         <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
           <div className="px-layer px-layer-bg absolute inset-0 w-full z-0">
@@ -153,19 +182,6 @@ export function ParallaxScene(): JSX.Element {
                 Let&rsquo;s weave them to your exact, treasured measure.
               </span>
             </h2>
-          </div>
-        </div>
-        {/* The rocket's OWN layer, z-50 — above the statement text (z-40) so
-         * the launch arc passes IN FRONT of the text. Same viewBox and the
-         * same .px-layer-fg sheet animation as the sewing world: the rocket
-         * rides that sheet through the roll-in and holds locked on the seam
-         * (the fg sheet is static from the hold onward), then departs
-         * through the text on its way out. Without scroll-timeline support
-         * / with reduced motion the .px-layer rules collapse this to a
-         * static copy that sits exactly where the art puts the needle. */}
-        <div className="px-layer px-layer-fg absolute inset-0 w-full z-50">
-          <div className="absolute inset-x-0 -inset-y-[6%]">
-            <RocketLayer />
           </div>
         </div>
       </div>
