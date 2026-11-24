@@ -1,0 +1,92 @@
+[
+  {
+    "v": 1,
+    "id": "A1",
+    "name": "Glass vitrine — museum dark",
+    "file": "01-glass-vitrine-museum-dark.png"
+  },
+  {
+    "v": 2,
+    "id": "A2",
+    "name": "Glass vitrine — cyan rim, wide",
+    "file": "02-glass-vitrine-cyan-rim-wide.png"
+  },
+  {
+    "v": 3,
+    "id": "A3",
+    "name": "Glass vitrine — amber nebula, low",
+    "file": "03-glass-vitrine-amber-nebula-low.png"
+  },
+  {
+    "v": 4,
+    "id": "B1",
+    "name": "Star orb — plinth, warm key",
+    "file": "04-star-orb-plinth-warm-key.png"
+  },
+  {
+    "v": 5,
+    "id": "B2",
+    "name": "Star orb — floating, cool",
+    "file": "05-star-orb-floating-cool.png"
+  },
+  {
+    "v": 6,
+    "id": "B3",
+    "name": "Star orb — constellation shell",
+    "file": "06-star-orb-constellation-shell.png"
+  },
+  {
+    "v": 7,
+    "id": "C1",
+    "name": "Papercraft box — warm lamp",
+    "file": "07-papercraft-box-warm-lamp.png"
+  },
+  {
+    "v": 8,
+    "id": "C2",
+    "name": "Papercraft box — moonlight",
+    "file": "08-papercraft-box-moonlight.png"
+  },
+  {
+    "v": 9,
+    "id": "C3",
+    "name": "Papercraft box — cut window, front",
+    "file": "09-papercraft-box-cut-window-front.png"
+  },
+  {
+    "v": 10,
+    "id": "D1",
+    "name": "Concrete vault — one warm spot",
+    "file": "10-concrete-vault-one-warm-spot.png"
+  },
+  {
+    "v": 11,
+    "id": "D2",
+    "name": "Concrete vault — cold starlight",
+    "file": "11-concrete-vault-cold-starlight.png"
+  },
+  {
+    "v": 12,
+    "id": "D3",
+    "name": "Concrete vault — alcoves lit",
+    "file": "12-concrete-vault-alcoves-lit.png"
+  },
+  {
+    "v": 13,
+    "id": "E1",
+    "name": "Hologram cube — cyan wireframe",
+    "file": "13-hologram-cube-cyan-wireframe.png"
+  },
+  {
+    "v": 14,
+    "id": "E2",
+    "name": "Hologram cube — amber on navy",
+    "file": "14-hologram-cube-amber-on-navy.png"
+  },
+  {
+    "v": 15,
+    "id": "E3",
+    "name": "Hologram cube — dotted graph, top",
+    "file": "15-hologram-cube-dotted-graph-top.png"
+  }
+]

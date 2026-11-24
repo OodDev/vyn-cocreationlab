@@ -1,0 +1,536 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VYN — 3D Cartoon Rocket Launch (textured)</title>
+<style>
+  html,body{margin:0;height:100%;overflow:hidden;background:#0b0d14;font-family:ui-sans-serif,system-ui,sans-serif}
+  canvas{display:block;position:absolute;inset:0;z-index:0}
+  #panel{position:fixed;inset:0;z-index:10;display:none;flex-direction:column;pointer-events:none;
+         background:linear-gradient(180deg,rgba(18,20,24,.94),rgba(10,12,16,.98))}
+  #panel.active{pointer-events:auto;display:flex}
+  #panel .card{margin:auto auto 0 auto;width:min(720px,92vw);max-height:88vh;overflow-y:auto;
+               padding:34px 40px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);
+               border-radius:18px;box-shadow:0 24px 70px rgba(0,0,0,.7);backdrop-filter:blur(10px);
+               color:#f2ede4;transform:translatey(14px);opacity:0;transition:transform .45s ease,opacity .45s ease}
+  #panel.active .card{transform:none;opacity:1}
+  #panel h2{margin:0 0 10px 0;font-size:22px;letter-spacing:.1em;color:#ffb065;font-weight:700}
+  #panel p{margin:0 0 14px 0;line-height:1.7;color:#d8d1c4;font-size:15px;opacity:.92}
+  #panel ul{margin:0 0 16px 0;padding-left:18px;color:#d8d1c4;font-size:15px;line-height:1.8}
+  #panel li{margin-bottom:6px}
+  #close{position:fixed;right:26px;top:26px;z-index:20;width:40px;height:40px;border:none;border-radius:50%;
+         background:rgba(255,255,255,.12);color:#f2ede4;cursor:pointer;font:600 14px/1 sans-serif;
+         display:grid;place-items:center;backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.18)}
+  #close:hover{background:rgba(255,176,101,.95);color:#0b0d14}
+  #hint{position:fixed;left:26px;bottom:26px;z-index:20;font:11px/1.5 ui-monospace,monospace;
+        color:#8a8478;letter-spacing:.14em;text-transform:uppercase;pointer-events:none;mix-blend-mode:difference}
+  #hint b{color:#f2ede4}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="panel">
+  <button id="close">✕</button>
+  <div id="card" class="card">
+    <h2 id="ctitle">Projects</h2>
+    <p id="ctext">Selected work — case studies, process, results.</p>
+    <ul id="clist">
+      <li>Hand-coded project 01 — static sites &amp; performance audits</li>
+      <li>AI-assisted project 01 — generative design pipelines</li>
+      <li>CMS project 01 — content-first editorial system</li>
+      <li>Hand-coded project 02 — interactive data dashboards</li>
+      <li>AI-assisted project 02 — creative coding experiments</li>
+      <li>Benefuturo — co-creation platform for social impact</li>
+    </ul>
+  </div>
+</div>
+<div id="hint">drag · orbit &nbsp;•&nbsp; scroll · zoom &nbsp;•&nbsp; click a star to open a section</div>
+
+<script type="importmap">
+{ "imports": { "three": "./vendor/three.module.js", "three/addons/": "./vendor/addons/" } }
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from './vendor/addons/OrbitControls.js';
+
+/* ---------- procedural cartoon textures ---------- */
+const loader = new THREE.TextureLoader();
+const texCache = {};
+function getTex(name, fn){
+  if(texCache[name]) return texCache[name];
+  const c = document.createElement('canvas'); c.width = 512; c.height = 512;
+  const x = c.getContext('2d');
+  fn(x, 512, 512);
+  const t = new THREE.CanvasTexture(c);
+  t.colorSpace = THREE.SRGBColorSpace;
+  t.magFilter = THREE.NearestFilter;   // crisp cartoon edges
+  t.minFilter = THREE.LinearMipmapLinearFilter;
+  texCache[name] = t;
+  return t;
+}
+
+// rocket body: yellow with panel lines & rivets
+const TEX_ROCKET_BODY = getTex('rocketBody', (x,w,h)=>{
+  x.fillStyle='#ffd166'; x.fillRect(0,0,w,h);
+  x.strokeStyle='#e8a33d'; x.lineWidth=6;
+  for(let i=0;i<5;i++){ x.beginPath(); x.arc(w/2, h*(0.2+i*0.18), w*0.48, 0, Math.PI*2); x.stroke(); }
+  // rivets
+  x.fillStyle='#d4a017';
+  for(let i=0;i<40;i++){
+    const a=Math.random()*Math.PI*2, r=w*(0.3+Math.random()*0.18);
+    x.globalAlpha=0.9; x.fillRect(w/2+Math.cos(a)*r-2, h/2+Math.sin(a)*r-2, 4, 4);
+  }
+  x.globalAlpha=1;
+});
+
+// nose cone: red with highlight stripe
+const TEX_NOSE = getTex('nose', (x,w,h)=>{
+  const grad=x.createLinearGradient(0,0,w,0);
+  grad.addColorStop(0,'#ef476f'); grad.addColorStop(0.5,'#ff6b81'); grad.addColorStop(1,'#ef476f');
+  x.fillStyle=grad; x.fillRect(0,0,w,h);
+  x.strokeStyle='#ffffff'; x.lineWidth=4; x.globalAlpha=0.35;
+  x.beginPath(); x.arc(w*0.5, h*0.5, w*0.35, 0, Math.PI*2); x.stroke();
+  x.globalAlpha=1;
+});
+
+// window glass
+const TEX_WINDOW = getTex('window', (x,w,h)=>{
+  x.fillStyle='#06d6a0'; x.fillRect(0,0,w,h);
+  x.strokeStyle='#ffffff'; x.lineWidth=3; x.globalAlpha=0.5;
+  x.beginPath(); x.arc(w/2,h/2,w*0.4,0,Math.PI*2); x.stroke();
+  x.globalAlpha=1;
+});
+
+// fin: orange with dark edge
+const TEX_FIN = getTex('fin', (x,w,h)=>{
+  x.fillStyle='#fb8500'; x.fillRect(0,0,w,h);
+  x.strokeStyle='#d46a00'; x.lineWidth=5;
+  x.beginPath(); x.moveTo(0,h); x.lineTo(w/2,0); x.lineTo(w,h); x.stroke();
+});
+
+// planet base textures
+function planetTex(base, crater, accent){
+  return getTex('planet_'+base, (x,w,h)=>{
+    x.fillStyle=base; x.fillRect(0,0,w,h);
+    // craters
+    for(let i=0;i<35;i++){
+      const r=Math.random()*24+6;
+      const g=x.createRadialGradient(Math.random()*w, Math.random()*h, 0, Math.random()*w, Math.random()*h, r);
+      g.addColorStop(0, crater); g.addColorStop(1, 'transparent');
+      x.fillStyle=g; x.globalAlpha=Math.random()*0.7+0.2;
+      x.beginPath(); x.arc(Math.random()*w, Math.random()*h, r, 0, Math.PI*2); x.fill();
+    }
+    // accent swirls
+    x.strokeStyle=accent; x.lineWidth=4; x.globalAlpha=0.5;
+    for(let i=0;i<4;i++){
+      x.beginPath(); x.ellipse(w*Math.random(), h*Math.random(), w*0.2, h*0.08, Math.random()*Math.PI, 0, Math.PI*2); x.stroke();
+    }
+    x.globalAlpha=1;
+  });
+}
+
+const TEX_PLANET_PURPLE = planetTex('#7b2cbf','#4a1a7a','#9b5de5');
+const TEX_PLANET_ORANGE = planetTex('#fb8500','#b34a1e','#ffb065');
+const TEX_PLANET_PINK   = planetTex('#ef476f','#c13584','#ff9aa2');
+const TEX_PLANET_GREEN  = planetTex('#06d6a0','#059a7c','#a8f0c6');
+const TEX_PLANET_YELLOW = planetTex('#ffd166','#e8a33d','#ffe082');
+
+// ground: dark soil with grass tufts
+const TEX_GROUND = getTex('ground', (x,w,h)=>{
+  x.fillStyle='#161b22'; x.fillRect(0,0,w,h);
+  x.fillStyle='#2d3a2a';
+  for(let i=0;i<600;i++){
+    x.globalAlpha=Math.random()*0.4+0.2;
+    x.fillRect(Math.random()*w, Math.random()*h, Math.random()*4+1, Math.random()*4+1);
+  }
+  x.globalAlpha=1;
+  x.strokeStyle='#3d5a3d'; x.lineWidth=2;
+  for(let i=0;i<40;i++){
+    x.beginPath(); x.arc(Math.random()*w, Math.random()*h, Math.random()*30+5, 0, Math.PI*2); x.stroke();
+  }
+});
+
+// tree bark
+const TEX_BARK = getTex('bark', (x,w,h)=>{
+  x.fillStyle='#5d4037'; x.fillRect(0,0,w,h);
+  x.strokeStyle='#4a3226'; x.lineWidth=3;
+  for(let i=0;i<12;i++){ x.beginPath(); x.moveTo(0, Math.random()*h); x.lineTo(w, Math.random()*h); x.stroke(); }
+  x.fillStyle='#8d6e63'; x.globalAlpha=0.3;
+  for(let i=0;i<25;i++){ x.beginPath(); x.arc(Math.random()*w, Math.random()*h, Math.random()*6+2, 0, Math.PI*2); x.fill(); }
+  x.globalAlpha=1;
+});
+
+// tree leaves (fluffy cloud-like)
+const TEX_LEAVES = getTex('leaves', (x,w,h)=>{
+  x.fillStyle='#4caf50'; x.fillRect(0,0,w,h);
+  x.fillStyle='#2e7d32'; x.globalAlpha=0.35;
+  for(let i=0;i<40;i++){ x.beginPath(); x.arc(Math.random()*w, Math.random()*h, Math.random()*12+4, 0, Math.PI*2); x.fill(); }
+  x.globalAlpha=1;
+});
+
+// cloud: fluffy white
+const TEX_CLOUD = getTex('cloud', (x,w,h)=>{
+  x.fillStyle='#ffffff'; x.fillRect(0,0,w,h);
+  x.fillStyle='#e3eaf6'; x.globalAlpha=0.6;
+  for(let i=0;i<30;i++){ x.beginPath(); x.arc(Math.random()*w, Math.random()*h, Math.random()*20+8, 0, Math.PI*2); x.fill(); }
+  x.globalAlpha=1;
+});
+
+// star sprite
+const TEX_STAR = getTex('star', (x,w,h)=>{
+  const grad=x.createRadialGradient(w/2,h/2,0,w/2,h/2,w/2);
+  grad.addColorStop(0,'#ffffff'); grad.addColorStop(0.4,'#ffd9a0'); grad.addColorStop(1,'transparent');
+  x.fillStyle=grad; x.fillRect(0,0,w,h);
+});
+
+/* ---------- scene ---------- */
+const W2 = innerWidth, H2 = innerHeight;
+const renderer = new THREE.WebGLRenderer({canvas: document.getElementById('c'), antialias: true});
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setSize(W2, H2);
+renderer.setClearColor('#0b0d14');
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color('#0b0d14');
+scene.fog = new THREE.FogExp2('#0b0d14', 0.014);
+
+const camera = new THREE.PerspectiveCamera(45, W2 / H2, 0.1, 200);
+camera.position.set(0, 1.5, 10);
+const target = new THREE.Vector3(0, 0, 0);
+camera.lookAt(target);
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.target.copy(target);
+controls.enableDamping = true;
+controls.dampingFactor = 0.06;
+controls.rotateSpeed = 0.5;
+controls.zoomSpeed = 0.8;
+controls.panSpeed = 0.5;
+controls.minDistance = 3;
+controls.maxDistance = 24;
+controls.maxPolarAngle = Math.PI * 0.8;
+controls.autoRotate = true;
+controls.autoRotateSpeed = 0.3;
+controls.update();
+
+/* ---------- lighting ---------- */
+const ambient = new THREE.AmbientLight('#ffe0b2', 1.0); scene.add(ambient);
+const key = new THREE.PointLight('#ffb065', 20, 45, 2); key.position.set(-7, 6, 6); key.castShadow = true; scene.add(key);
+const fill = new THREE.PointLight('#06d6a0', 8, 40, 1.5); fill.position.set(6, 1, -6); scene.add(fill);
+const rim = new THREE.SpotLight('#ff9f1c', 13, 50, Math.PI / 5, 0.4, 1); rim.position.set(0, 7, 4); rim.lookAt(0,0,0); rim.castShadow = true; scene.add(rim);
+
+/* ---------- ground ---------- */
+const ground = new THREE.Mesh(
+  new THREE.PlaneGeometry(70, 70),
+  new THREE.MeshStandardMaterial({ map: TEX_GROUND, roughness: 1, metalness: 0 })
+);
+ground.rotation.x = -Math.PI / 2;
+ground.position.y = -2.9;
+ground.receiveShadow = true;
+scene.add(ground);
+
+const launchPad = new THREE.Mesh(
+  new THREE.CylinderGeometry(1.8, 1.8, 0.8, 32),
+  new THREE.MeshStandardMaterial({ color:'#2a2a40', roughness:1, metalness:0 })
+);
+launchPad.position.y = -3.3;
+launchPad.receiveShadow = true;
+scene.add(launchPad);
+
+/* ---------- detailed rocket ---------- */
+function buildRocket(){
+  const rocket = new THREE.Group();
+
+  // main body
+  const body = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.6, 0.6, 3.6, 32),
+    new THREE.MeshStandardMaterial({ map: TEX_ROCKET_BODY, roughness: 0.6, metalness: 0.15 })
+  );
+  body.position.y = 0;
+  body.castShadow = true; body.receiveShadow = true;
+  rocket.add(body);
+
+  // nose cone
+  const nose = new THREE.Mesh(
+    new THREE.ConeGeometry(0.66, 1.7, 32),
+    new THREE.MeshStandardMaterial({ map: TEX_NOSE, roughness: 0.5, metalness: 0.1 })
+  );
+  nose.position.y = 2.5;
+  nose.castShadow = true;
+  rocket.add(nose);
+
+  // window
+  const winGeo = new THREE.RingGeometry(0.18, 0.28, 32);
+  const winMat = new THREE.MeshBasicMaterial({ map: TEX_WINDOW, transparent: true, opacity: 0.95, side: THREE.DoubleSide });
+  const win = new THREE.Mesh(winGeo, winMat);
+  win.position.set(0.62, 0.3, 0.61);
+  win.lookAt(new THREE.Vector3(1, 0.3, 0.61));
+  rocket.add(win);
+  const winGlow = new THREE.Sprite(new THREE.SpriteMaterial({ color:'#06d6a0', transparent: true, opacity: 0.5 }));
+  winGlow.position.copy(win.position); winGlow.scale.setScalar(1.6);
+  rocket.add(winGlow);
+
+  // fins (4)
+  const finMat = new THREE.MeshStandardMaterial({ map: TEX_FIN, roughness: 0.85, metalness: 0 });
+  for(let i=0;i<4;i++){
+    const ang = (i/4)*Math.PI*2;
+    const fin = new THREE.Mesh(
+      new THREE.CylinderGeometry(0, 0.5, 1.4, 4),
+      finMat
+    );
+    fin.position.set(Math.cos(ang)*0.7, -1.35, Math.sin(ang)*0.7);
+    fin.rotation.x = Math.PI/2;
+    fin.rotation.z = ang;
+    fin.scale.set(1, 1, 0.55);
+    fin.castShadow = true;
+    rocket.add(fin);
+  }
+
+  // exhaust flame group
+  const flame = new THREE.Group();
+  const flameMat = new THREE.MeshBasicMaterial({ color:'#ff9f1c', transparent: true, opacity: 0.9 });
+  for(let i=0;i<8;i++){
+    const f = new THREE.Mesh(
+      new THREE.ConeGeometry(0.22 + Math.random()*0.15, 1.2 + Math.random()*0.9, 12),
+      flameMat
+    );
+    f.position.y = -2.1 - Math.random()*0.6;
+    f.rotation.x = Math.PI/2;
+    f.scale.set(1, 1 + Math.random()*0.5, 1);
+    flame.add(f);
+  }
+  rocket.add(flame);
+  rocket.userData.flame = flame;
+
+  return rocket;
+}
+
+const rocket = buildRocket();
+rocket.position.y = -1.15;
+scene.add(rocket);
+
+/* ---------- planets ---------- */
+function planet(pos, r, map, craterColor){
+  const g = new THREE.SphereGeometry(r, 40, 30);
+  const m = new THREE.MeshStandardMaterial({ map, roughness: 0.5, metalness: 0 });
+  const p = new THREE.Mesh(g, m); p.position.set(...pos); p.castShadow = true; p.receiveShadow = true; scene.add(p);
+  // extra raised craters for cartoon depth
+  for(let i=0;i<14;i++){
+    const cr = new THREE.Mesh(
+      new THREE.SphereGeometry(r*(0.06+Math.random()*0.12), 10, 8),
+      new THREE.MeshStandardMaterial({ color: craterColor, roughness: 1, metalness: 0 })
+    );
+    const phi=Math.random()*Math.PI*2, cost=2*Math.random()-1;
+    const sx=Math.sqrt(1-cost*cost)*Math.cos(phi);
+    const sy=cost;
+    const sz=Math.sqrt(1-cost*cost)*Math.sin(phi);
+    cr.position.set(sx*(r*0.86), sy*(r*0.86), sz*(r*0.86));
+    const n=cr.position.clone().normalize();
+    cr.position.addScaledVector(n, r*0.05);
+    p.add(cr);
+  }
+  return p;
+}
+
+planet([-8, -1.4, 5], 1.9, TEX_PLANET_PURPLE, '#4a1a7a');
+planet([7, -2.2, 4], 1.5, TEX_PLANET_ORANGE, '#b34a1e');
+planet([-3, 2.6, -6.5], 1.2, TEX_PLANET_PINK, '#c13584');
+planet([5, 3.8, -5.2], 0.85, TEX_PLANET_GREEN, '#059a7c');
+planet([0.5, -3.1, -7.2], 0.7, TEX_PLANET_YELLOW, '#e8a33d');
+planet([-5.5, 0.4, -7], 1.05, TEX_PLANET_PURPLE, '#4a1a7a');
+planet([6.5, 1.4, -3], 0.6, TEX_PLANET_ORANGE, '#b34a1e');
+planet([-7, -3.4, 2], 0.5, TEX_PLANET_PINK, '#c13584');
+
+/* ---------- clouds ---------- */
+function cloud(pos, s){
+  const g = new THREE.Group();
+  for(let i=0;i<9;i++){
+    const b = new THREE.Mesh(
+      new THREE.SphereGeometry(0.6 + Math.random()*1.1, 16, 14),
+      new THREE.MeshStandardMaterial({ map: TEX_CLOUD, transparent: true, opacity: 0.92 })
+    );
+    b.position.set(THREE.MathUtils.randFloat(-1.4,1.4), THREE.MathUtils.randFloat(-0.9,0.9), THREE.MathUtils.randFloat(-1.4,1.4));
+    b.scale.setScalar(THREE.MathUtils.randFloat(0.6,1.1));
+    b.castShadow = true; b.receiveShadow = true;
+    g.add(b);
+  }
+  g.position.set(...pos); g.scale.setScalar(s); scene.add(g); return g;
+}
+cloud([-4.5, 1.6, -2.5], 1.1);
+cloud([4.5, 1.3, -3.5], 1.3);
+cloud([0, 2.5, -5], 0.9);
+cloud([-6.5, 0.9, 3], 1.0);
+cloud([7, 0.6, 4], 1.2);
+
+/* ---------- trees ---------- */
+function tree(pos, s){
+  const g = new THREE.Group();
+  const trunk = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.16, 0.22, 1.1, 12),
+    new THREE.MeshStandardMaterial({ map: TEX_BARK, roughness: 1, metalness: 0 })
+  );
+  trunk.position.y = 0.55; trunk.castShadow = true; trunk.receiveShadow = true; g.add(trunk);
+  for(let i=0;i<5;i++){
+    const l = new THREE.Mesh(
+      new THREE.SphereGeometry(0.62, 16, 14),
+      new THREE.MeshStandardMaterial({ map: TEX_LEAVES, roughness: 1, metalness: 0 })
+    );
+    l.position.set(THREE.MathUtils.randFloat(-0.6,0.6), 1.1 + i*0.5 + Math.random()*0.25, THREE.MathUtils.randFloat(-0.6,0.6));
+    l.scale.setScalar(THREE.MathUtils.randFloat(0.7,1.1));
+    l.castShadow = true; l.receiveShadow = true; g.add(l);
+  }
+  g.position.set(...pos); g.scale.setScalar(s); scene.add(g); return g;
+}
+
+tree([-3.6, -2.9, 2.6], 0.95);
+tree([-2.0, -2.9, 3.3], 1.05);
+tree([3.4, -2.9, 2.8], 0.9);
+tree([4.8, -2.9, 1.6], 1.0);
+tree([-5.0, -2.9, 0.4], 1.05);
+tree([5.2, -2.9, -1.6], 0.85);
+tree([-5.6, -2.9, -2.6], 0.95);
+tree([2.9, -2.9, -4.5], 1.0);
+tree([-2.5, -2.9, -4.9], 0.9);
+tree([0.8, -2.9, -5.4], 1.05]);
+tree([-4.0, -2.9, -1.2], 0.85);
+tree([4.0, -2.9, -3.2], 0.9);
+
+/* ---------- star field (twinkling sprites) ---------- */
+const starSprites = [];
+for(let i=0;i<220;i++){
+  const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: TEX_STAR, transparent: true, opacity: Math.random()*0.6+0.2 }));
+  s.position.set(THREE.MathUtils.randFloatSpread(60), THREE.MathUtils.randFloatSpread(60), THREE.MathUtils.randFloatSpread(60));
+  s.scale.setScalar(0.15 + Math.random()*0.25);
+  s.userData.baseOpacity = s.material.opacity;
+  scene.add(s); starSprites.push(s);
+}
+
+/* ---------- exhaust animation ---------- */
+let t=0;
+function animateFlame(){
+  const flame = rocket.userData.flame;
+  if(!flame) return;
+  flame.children.forEach(f=>{
+    f.scale.y = 0.8 + Math.sin(t*14 + f.position.y)*0.28;
+    f.scale.x = 0.8 + Math.cos(t*11 + f.position.y)*0.18;
+    f.scale.z = f.scale.x;
+    f.material.opacity = 0.65 + Math.sin(t*17 + f.position.y)*0.22;
+  });
+}
+
+/* ---------- clickable section stars ---------- */
+const SECTIONS = [
+  {label:'Projects', pos:[-2.6, 1.3, 2.2], color:'#ffb065'},
+  {label:'About',    pos:[ 2.6, 0.9, 2.4], color:'#06d6a0'},
+  {label:'FAQ',      pos:[-1.7, -0.9, 2.6], color:'#ef476f'},
+  {label:'Contact',  pos:[ 1.7, -1.1, 2.5], color:'#fb8500'},
+];
+const stars=[];
+SECTIONS.forEach((sec,i)=>{
+  const s = new THREE.Sprite(new THREE.SpriteMaterial({ color:sec.color, transparent: true, opacity: 0.92 }));
+  s.position.set(...sec.pos); s.scale.setScalar(0.38);
+  s.userData.label = sec.label;
+  scene.add(s); stars.push(s);
+});
+
+/* ---------- overlay panel ---------- */
+const panel = document.getElementById('panel');
+const card  = document.getElementById('card');
+const ctitle= document.getElementById('ctitle');
+const ctext = document.getElementById('ctext');
+const clist = document.getElementById('clist');
+const close = document.getElementById('close');
+
+const COPY = {
+  Projects:['Selected work — case studies, process, results.',
+    ['Hand-coded project 01 — static sites & performance audits',
+     'AI-assisted project 01 — generative design pipelines',
+     'CMS project 01 — content-first editorial system',
+     'Hand-coded project 02 — interactive data dashboards',
+     'AI-assisted project 02 — creative coding experiments',
+     'Benefuturo — co-creation platform for social impact']],
+  About:['The studio, the method, the people behind it.',
+    ['A small co-creation lab based on paper, code & conversation',
+     'We build sites that load fast, read clear and stay online',
+     'No black-box build steps unless you ask for them']],
+  FAQ:['How we work, timelines, budgets, collaboration.',
+    ['Timeline: most sites ship in 2–6 weeks',
+     'Budget: day-rate or fixed project fee, agreed up front',
+     'Collaboration: Figma → code → static export, no lock-in']],
+  Contact:['Start a project or just say hello.',
+    ['Email: hello@vyn.example',
+     'Form: contact page (coming next)',
+     'Office: by appointment, bring snacks']],
+};
+
+function openSection(label){
+  const c = COPY[label];
+  ctitle.textContent = label;
+  ctext.textContent = c[0];
+  clist.innerHTML = c[1].map(x => `<li>${x}</li>`).join('');
+  panel.classList.add('active');
+}
+function closePanel(){ panel.classList.remove('active'); }
+close.onclick = closePanel;
+panel.addEventListener('click', (e)=>{ if(e.target===panel) closePanel(); });
+
+const raycaster = new THREE.Raycaster();
+const pointer = new THREE.Vector2();
+let hoverLabel = null;
+renderer.domElement.style.cursor = 'grab';
+renderer.domElement.addEventListener('pointerdown', (e)=>{
+  if(panel.classList.contains('active')) return;
+  pointer.x = (e.clientX / W2) * 2 - 1;
+  pointer.y = -(e.clientY / H2) * 2 + 1;
+  raycaster.setFromCamera(pointer, camera);
+  const hits = raycaster.intersectObjects(stars, true);
+  for(const h of hits){
+    let o = h.object;
+    while(o && !o.userData.label) o = o.parent;
+    if(o?.userData.label){ openSection(o.userData.label); return; }
+  }
+});
+renderer.domElement.addEventListener('pointermove', (e)=>{
+  pointer.x = (e.clientX / W2) * 2 - 1;
+  pointer.y = -(e.clientY / H2) * 2 + 1;
+  raycaster.setFromCamera(pointer, camera);
+  const hits = raycaster.intersectObjects(stars, true);
+  let lab = null;
+  for(const h of hits){ let o=h.object; while(o && !o.userData.label) o=o.parent; if(o?.userData.label){lab=o.userData.label;break;} }
+  if(lab!==hoverLabel){
+    hoverLabel = lab;
+    renderer.domElement.style.cursor = lab ? 'pointer' : 'grab';
+    stars.forEach(s=>{ s.material.opacity = (s.userData.label===lab) ? 1 : 0.72; });
+  }
+});
+
+function resize(){
+  const w=innerWidth, h=innerHeight;
+  camera.aspect = w/h; camera.updateProjectionMatrix();
+  renderer.setSize(w,h);
+}
+addEventListener('resize', resize);
+resize();
+
+renderer.setAnimationLoop(()=>{
+  t += 0.016;
+  animateFlame();
+  rocket.rotation.z = Math.sin(t*0.5)*0.04;
+  rocket.position.y = -1.15 + Math.sin(t*0.7)*0.08;
+  stars.forEach((s,i)=>{
+    s.position.y = SECTIONS[i].pos[1] + Math.sin(t*1.3+i)*0.05;
+  });
+  // twinkle stars
+  starSprites.forEach(s=>{
+    s.material.opacity = s.userData.baseOpacity + Math.sin(t*3 + s.position.x)*0.25;
+  });
+  controls.update();
+  renderer.render(scene, camera);
+});
+</script>
+</body>
+</html>

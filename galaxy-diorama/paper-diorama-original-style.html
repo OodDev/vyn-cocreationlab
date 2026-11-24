@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VYN — Galaxy Diorama (original style)</title>
+<style>
+  html,body{margin:0;height:100%;overflow:hidden;background:#1a1a3e;font-family:ui-sans-serif,system-ui,sans-serif}
+  canvas{display:block;position:absolute;inset:0;z-index:0}
+  #panel{position:fixed;inset:0;z-index:10;display:none;flex-direction:column;pointer-events:none;
+         background:linear-gradient(180deg,rgba(26,26,62,.94),rgba(15,15,30,.98))}
+  #panel.active{pointer-events:auto;display:flex}
+  #panel .card{margin:auto auto 0 auto;width:min(720px,92vw);max-height:88vh;overflow-y:auto;
+               padding:34px 40px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);
+               border-radius:18px;box-shadow:0 24px 70px rgba(0,0,0,.7);backdrop-filter:blur(10px);
+               color:#f2ede4;transform:translatey(14px);opacity:0;transition:transform .45s ease,opacity .45s ease}
+  #panel.active .card{transform:none;opacity:1}
+  #panel h2{margin:0 0 10px 0;font-size:22px;letter-spacing:.1em;color:#ffb065;font-weight:700}
+  #panel p{margin:0 0 14px 0;line-height:1.7;color:#d8d1c4;font-size:15px;opacity:.92}
+  #panel ul{margin:0 0 16px 0;padding-left:18px;color:#d8d1c4;font-size:15px;line-height:1.8}
+  #panel li{margin-bottom:6px}
+  #close{position:fixed;right:26px;top:26px;z-index:20;width:40px;height:40px;border:none;border-radius:50%;
+         background:rgba(255,255,255,.12);color:#f2ede4;cursor:pointer;font:600 14px/1 sans-serif;
+         display:grid;place-items:center;backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.18)}
+  #close:hover{background:rgba(255,176,101,.95);color:#0b0d14}
+  #hint{position:fixed;left:26px;bottom:26px;z-index:20;font:11px/1.5 ui-monospace,monospace;
+        color:#8a8478;letter-spacing:.14em;text-transform:uppercase;pointer-events:none;mix-blend-mode:difference}
+  #hint b{color:#f2ede4}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="panel">
+  <button id="close">✕</button>
+  <div id="card" class="card">
+    <h2 id="ctitle">Projects</h2>
+    <p id="ctext">Selected work — case studies, process, results.</p>
+    <ul id="clist">
+      <li>Hand-coded project 01 — static sites &amp; performance audits</li>
+      <li>AI-assisted project 01 — generative design pipelines</li>
+      <li>CMS project 01 — content-first editorial system</li>
+      <li>Hand-coded project 02 — interactive data dashboards</li>
+      <li>AI-assisted project 02 — creative coding experiments</li>
+      <li>Benefuturo — co-creation platform for social impact</li>
+    </ul>
+  </div>
+</div>
+<div id="hint">drag · orbit &nbsp;•&nbsp; scroll · zoom &nbsp;•&nbsp; click a star to open a section</div>
+
+<script type="importmap">
+{ "imports": { "three": "./vendor/three.module.js", "three/addons/": "./vendor/addons/" } }
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from './vendor/addons/OrbitControls.js';
+
+/* ---------- reference image as backdrop ---------- */
+const BG_URL = './reference_cartoon_images/best ones/original-ed1c1a661782538c3b29579493c2b1c4.webp';
+const loader = new THREE.TextureLoader();
+const T = {};
+await new Promise((res, rej) => loader.load(BG_URL, t => { T.bg = t; res(); }, undefined, rej));
+T.bg.colorSpace = THREE.SRGBColorSpace;
+T.bg.magFilter = THREE.LinearFilter;
+T.bg.minFilter = THREE.LinearMipmapLinearFilter;
+
+/* ---------- procedural star / planet textures ---------- */
+function craterTex(base, craterColor, speckColor) {
+  const c = document.createElement('canvas'); c.width = 512; c.height = 512;
+  const x = c.getContext('2d');
+  x.fillStyle = base; x.fillRect(0, 0, 512, 512);
+  // craters
+  for (let i = 0; i < 45; i++) {
+    const r = Math.random() * 16 + 4;
+    const g = x.createRadialGradient(Math.random()*512, Math.random()*512, 0, Math.random()*512, Math.random()*512, r);
+    g.addColorStop(0, craterColor); g.addColorStop(1, 'transparent');
+    x.fillStyle = g; x.globalAlpha = Math.random() * 0.85 + 0.1;
+    x.beginPath(); x.arc(Math.random()*512, Math.random()*512, r, 0, Math.PI*2); x.fill();
+  }
+  // surface specks
+  x.globalAlpha = 1;
+  for (let i = 0; i < 600; i++) {
+    x.fillStyle = Math.random() < 0.5 ? speckColor : base;
+    x.globalAlpha = Math.random() * 0.15;
+    x.fillRect(Math.random()*512, Math.random()*512, 2, 2);
+  }
+  x.globalAlpha = 1;
+  const t = new THREE.CanvasTexture(c);
+  t.colorSpace = THREE.SRGBColorSpace;
+  return t;
+}
+
+function bandedPlanetTex(base, band, highlight) {
+  const c = document.createElement('canvas'); c.width = 512; c.height = 512;
+  const x = c.getContext('2d');
+  x.fillStyle = base; x.fillRect(0, 0, 512, 512);
+  // horizontal swirl bands
+  for (let i = 0; i < 5; i++) {
+    const cy = Math.random() * 512;
+    const r = 120 + Math.random() * 140;
+    const g = x.createLinearGradient(0, cy - r, 0, cy + r);
+    g.addColorStop(0, 'transparent'); g.addColorStop(0.4, band); g.addColorStop(0.6, band); g.addColorStop(1, 'transparent');
+    x.fillStyle = g;
+    x.beginPath(); x.ellipse(256, cy, r + Math.random()*60, r*0.35, Math.random()*0.6, 0, Math.PI*2); x.fill();
+  }
+  // small bright spot / crater
+  x.fillStyle = highlight; x.globalAlpha = 0.9;
+  x.beginPath(); x.arc(256 + Math.random()*120 - 60, 256 + Math.random()*120 - 60, 10 + Math.random()*14, 0, Math.PI*2); x.fill();
+  x.globalAlpha = 1;
+  const t = new THREE.CanvasTexture(c);
+  t.colorSpace = THREE.SRGBColorSpace;
+  return t;
+}
+
+const TEX = {
+  magenta: bandedPlanetTex('#c01fc6', '#e84ec8', '#ffb065'),
+  purpleCrater: craterTex('#7b2cbf', '#4a1a7a', '#9d50bb'),
+  orangeCrater: craterTex('#ff6b35', '#b34a1e', '#ffb065'),
+  ringedPurple: craterTex('#9b5de5', '#6a3ea3', '#c39bd3'),
+  smallPink: craterTex('#ff69b4', '#d63384', '#ffb065'),
+  space: new THREE.CanvasTexture((() => {
+    const c = document.createElement('canvas'); c.width = 1024; c.height = 1024;
+    const x = c.getContext('2d');
+    // deep purple -> blue gradient
+    const g = x.createLinearGradient(0, 0, 0, 1024);
+    g.addColorStop(0, '#14143a'); g.addColorStop(0.5, '#23205a'); g.addColorStop(1, '#10102a');
+    x.fillStyle = g; x.fillRect(0, 0, 1024, 1024);
+    // nebula swirls
+    for (let i = 0; i < 6; i++) {
+      const grad = x.createRadialGradient(Math.random()*1024, Math.random()*1024, 50, Math.random()*1024, Math.random()*1024, 500);
+      grad.addColorStop(0, 'rgba(200, 50, 200, 0.18)'); grad.addColorStop(1, 'transparent');
+      x.fillStyle = grad;
+      x.beginPath(); x.arc(Math.random()*1024, Math.random()*1024, 400 + Math.random()*400, 0, Math.PI*2); x.fill();
+    }
+    // stars
+    x.fillStyle = '#ffffff';
+    for (let i = 0; i < 700; i++) {
+      x.globalAlpha = Math.random();
+      x.fillRect(Math.random()*1024, Math.random()*1024, Math.random()*2 + 0.5, Math.random()*2 + 0.5);
+    }
+    x.globalAlpha = 1;
+    const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
+  })()),
+};
+
+const W = innerWidth, H = innerHeight;
+const renderer = new THREE.WebGLRenderer({canvas: document.getElementById('c'), antialias: true});
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setSize(W, H);
+renderer.setClearColor('#14143a');
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+
+const scene = new THREE.Scene();
+scene.background = new THREE.MeshBasicMaterial({ map: T.bg }).map ? null : new THREE.Color('#14143a');
+// use reference image as sky sphere
+const sky = new THREE.Mesh(
+  new THREE.SphereGeometry(60, 64, 32),
+  new THREE.MeshBasicMaterial({ map: T.bg, side: THREE.BackSide })
+);
+scene.add(sky);
+
+const camera = new THREE.PerspectiveCamera(45, W / H, 0.1, 200);
+camera.position.set(0, 0, 6);
+const target = new THREE.Vector3(0, 0, 0);
+camera.lookAt(target);
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.target.copy(target);
+controls.enableDamping = true;
+controls.dampingFactor = 0.05;
+controls.rotateSpeed = 0.5;
+controls.zoomSpeed = 0.9;
+controls.panSpeed = 0.5;
+controls.minDistance = 2.5;
+controls.maxDistance = 14;
+controls.maxPolarAngle = Math.PI * 0.72;
+controls.autoRotate = true;
+controls.autoRotateSpeed = 0.18;
+controls.update();
+
+/* ---------- lighting (magenta/purple ambient, warm key) ---------- */
+const ambient = new THREE.AmbientLight('#e0aaff', 1.1); scene.add(ambient);
+const key = new THREE.PointLight('#ffb065', 14, 24, 2); key.position.set(-4, 3.5, 3); scene.add(key);
+const fill = new THREE.PointLight('#7fd3c4', 5, 22, 1.5); fill.position.set(3.5, 0.5, -3); scene.add(fill);
+const rim = new THREE.SpotLight('#ff00cc', 10, 30, Math.PI / 4, 0.4, 1); rim.position.set(0, 5, 1.5); rim.lookAt(0,0,0); scene.add(rim);
+
+/* ---------- cartoon star sprite ---------- */
+function starNode(pos, color, size = 0.34, label) {
+  const s = new THREE.Sprite(new THREE.SpriteMaterial({ color, transparent: true, opacity: 0.92 }));
+  s.position.set(...pos); s.scale.setScalar(size);
+  const g = new THREE.Group(); g.add(s); g.userData.pos = pos.slice(); g.userData.label = label;
+  return g;
+}
+
+const root = new THREE.Group();
+scene.add(root);
+
+/* ---------- planets matching the reference image ---------- */
+function planet(pos, r, map, rings = false) {
+  const g = new THREE.SphereGeometry(r, 40, 30);
+  const m = new THREE.MeshStandardMaterial({ map, roughness: 0.55, metalness: 0, flatShading: false });
+  const p = new THREE.Mesh(g, m); p.position.set(...pos); root.add(p);
+  if (rings) {
+    const ring = new THREE.Mesh(new THREE.RingGeometry(r * 1.6, r * 2.35, 64),
+      new THREE.MeshBasicMaterial({ color: '#d8b4fe', side: THREE.DoubleSide, transparent: true, opacity: 0.55 }));
+    ring.rotation.x = Math.PI / 2 + 0.12; ring.position.copy(pos); root.add(ring);
+  }
+  return p;
+}
+
+// large magenta planet center (the main one from the image)
+planet([0, 0, 0], 1.5, TEX.magenta);
+// purple cratered planet bottom left
+planet([-2.2, -1.1, 1.2], 0.62, TEX.purpleCrater);
+// orange cratered planet bottom right
+planet([2.0, -1.4, 1.4], 0.58, TEX.orangeCrater);
+// ringed purple planet top right back
+planet([2.6, 1.9, -3.6], 0.72, TEX.ringedPurple, true);
+// small pink planet top middle
+planet([0.2, 2.0, -2.8], 0.26, TEX.smallPink);
+// tiny red planet bottom center
+planet([-0.4, -2.1, 2.0], 0.16, TEX.orangeCrater);
+
+/* ---------- comets / shooting stars ---------- */
+function comet(pos, dir, color, len = 1.4) {
+  const g = new THREE.Group();
+  const head = new THREE.Mesh(new THREE.SphereGeometry(0.07, 12, 10),
+    new THREE.MeshBasicMaterial({ color }));
+  head.position.copy(pos); g.add(head);
+  const trail = new THREE.Mesh(new THREE.ConeGeometry(0.05, len, 8),
+    new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.55 }));
+  trail.position.copy(pos).addScaledVector(dir, -len/2);
+  trail.lookAt(new THREE.Vector3().copy(pos).add(dir));
+  trail.rotateX(Math.PI/2); g.add(trail);
+  root.add(g); return g;
+}
+comet([-4.2, 2.6, -1], new THREE.Vector3(0.75, -0.55, 0.2).normalize(), '#ffb065');
+comet([-3.6, 0.2, 0.4], new THREE.Vector3(0.8, -0.2, 0.1).normalize(), '#e84ec8');
+comet([4.4, -0.6, -2.2], new THREE.Vector3(-0.6, 0.4, -0.1).normalize(), '#ffd9a0');
+
+/* ---------- distant star field ---------- */
+const starPts = [];
+for (let i = 0; i < 400; i++) starPts.push(new THREE.Vector3(THREE.MathUtils.randFloatSpread(45), THREE.MathUtils.randFloatSpread(45), THREE.MathUtils.randFloatSpread(45)));
+scene.add(new THREE.Points(new THREE.BufferGeometry().setFromPoints(starPts),
+  new THREE.PointsMaterial({ color: '#ffffff', size: 0.07, transparent: true, opacity: 0.85 })));
+
+/* ---------- clickable section stars (placed like destinations in the scene) ---------- */
+const SECTIONS = [
+  { label: 'Projects', pos: [-1.5, 0.6, 1.0], color: '#ffb065' },
+  { label: 'About',    pos: [ 1.5, 0.4, 0.9], color: '#7fd3c4' },
+  { label: 'FAQ',      pos: [-0.9, -0.6, 1.1], color: '#e84ec8' },
+  { label: 'Contact',  pos: [ 0.9, -0.8, 1.0], color: '#ffd9a0' },
+];
+const stars = [];
+SECTIONS.forEach((sec, i) => {
+  const n = starNode(sec.pos, sec.color, 0.30, sec.label);
+  root.add(n); stars.push(n);
+});
+
+/* ---------- overlay panel ---------- */
+const panel = document.getElementById('panel');
+const card  = document.getElementById('card');
+const ctitle= document.getElementById('ctitle');
+const ctext = document.getElementById('ctext');
+const clist = document.getElementById('clist');
+const close = document.getElementById('close');
+
+const COPY = {
+  Projects:['Selected work — case studies, process, results.',
+    ['Hand-coded project 01 — static sites & performance audits',
+     'AI-assisted project 01 — generative design pipelines',
+     'CMS project 01 — content-first editorial system',
+     'Hand-coded project 02 — interactive data dashboards',
+     'AI-assisted project 02 — creative coding experiments',
+     'Benefuturo — co-creation platform for social impact']],
+  About:['The studio, the method, the people behind it.',
+    ['A small co-creation lab based on paper, code & conversation',
+     'We build sites that load fast, read clear and stay online',
+     'No black-box build steps unless you ask for them',
+     'Hand-crafted, like the cosmos in this scene']],
+  FAQ:['How we work, timelines, budgets, collaboration.',
+    ['Timeline: most sites ship in 2–6 weeks',
+     'Budget: day-rate or fixed project fee, agreed up front',
+     'Collaboration: Figma → code → static export, no lock-in',
+     'Hosting: Vercel static export, or wherever you prefer']],
+  Contact:['Start a project or just say hello.',
+    ['Email: hello@vyn.example',
+     'Form: contact page (coming next)',
+     'Office: by appointment, bring snacks']],
+};
+
+function openSection(label){
+  const c = COPY[label];
+  ctitle.textContent = label;
+  ctext.textContent = c[0];
+  clist.innerHTML = c[1].map(x => `<li>${x}</li>`).join('');
+  panel.classList.add('active');
+}
+function closePanel(){ panel.classList.remove('active'); }
+close.onclick = closePanel;
+panel.addEventListener('click', (e)=>{ if(e.target===panel) closePanel(); });
+
+/* ---------- interaction ---------- */
+const raycaster = new THREE.Raycaster();
+const pointer = new THREE.Vector2();
+let hoverLabel = null;
+renderer.domElement.style.cursor = 'grab';
+renderer.domElement.addEventListener('pointerdown', (e)=>{
+  if(panel.classList.contains('active')) return;
+  pointer.x = (e.clientX / W) * 2 - 1;
+  pointer.y = -(e.clientY / H) * 2 + 1;
+  raycaster.setFromCamera(pointer, camera);
+  const hits = raycaster.intersectObjects(stars, true);
+  for(const h of hits){
+    let o = h.object;
+    while(o && !o.userData.label) o = o.parent;
+    if(o?.userData.label){ openSection(o.userData.label); return; }
+  }
+});
+renderer.domElement.addEventListener('pointermove', (e)=>{
+  pointer.x = (e.clientX / W) * 2 - 1;
+  pointer.y = -(e.clientY / H) * 2 + 1;
+  raycaster.setFromCamera(pointer, camera);
+  const hits = raycaster.intersectObjects(stars, true);
+  let lab = null;
+  for(const h of hits){ let o=h.object; while(o && !o.userData.label) o=o.parent; if(o?.userData.label){lab=o.userData.label;break;} }
+  if(lab!==hoverLabel){
+    hoverLabel = lab;
+    renderer.domElement.style.cursor = lab ? 'pointer' : 'grab';
+    stars.forEach(s=>{ s.children[0].material.opacity = (s.userData.label===lab) ? 1 : 0.82; });
+  }
+});
+
+function resize(){
+  const w=innerWidth, h=innerHeight;
+  camera.aspect = w/h; camera.updateProjectionMatrix();
+  renderer.setSize(w,h);
+}
+addEventListener('resize', resize);
+resize();
+
+let t=0;
+renderer.setAnimationLoop(()=>{
+  t += 0.016;
+  stars.forEach((s,i)=>{
+    s.position.y = SECTIONS[i].pos[1] + Math.sin(t*1.2 + i)*0.04;
+    s.children[0].material.opacity = 0.82 + Math.sin(t*1.5+i)*0.08;
+  });
+  controls.update();
+  renderer.render(scene, camera);
+});
+</script>
+</body>
+</html>

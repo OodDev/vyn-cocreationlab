@@ -1,0 +1,338 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VYN — Paper Diorama (textured)</title>
+<style>
+  html,body{margin:0;height:100%;overflow:hidden;background:#0b0d14;font-family:ui-sans-serif,system-ui,sans-serif}
+  canvas{display:block;position:absolute;inset:0;z-index:0}
+  #panel{position:fixed;inset:0;z-index:10;display:none;flex-direction:column;pointer-events:none;
+         background:linear-gradient(180deg,rgba(18,20,24,.94),rgba(10,12,16,.98))}
+  #panel.active{pointer-events:auto;display:flex}
+  #panel .card{margin:auto auto 0 auto;width:min(720px,92vw);max-height:88vh;overflow-y:auto;
+               padding:34px 40px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.14);
+               border-radius:18px;box-shadow:0 24px 70px rgba(0,0,0,.7);backdrop-filter:blur(10px);
+               color:#f2ede4;transform:translatey(14px);opacity:0;transition:transform .45s ease,opacity .45s ease}
+  #panel.active .card{transform:none;opacity:1}
+  #panel h2{margin:0 0 10px 0;font-size:22px;letter-spacing:.1em;color:#ffb065;font-weight:700}
+  #panel p{margin:0 0 14px 0;line-height:1.7;color:#d8d1c4;font-size:15px;opacity:.92}
+  #panel ul{margin:0 0 16px 0;padding-left:18px;color:#d8d1c4;font-size:15px;line-height:1.8}
+  #panel li{margin-bottom:6px}
+  #close{position:fixed;right:26px;top:26px;z-index:20;width:40px;height:40px;border:none;border-radius:50%;
+         background:rgba(255,255,255,.12);color:#f2ede4;cursor:pointer;font:600 14px/1 sans-serif;
+         display:grid;place-items:center;backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.18)}
+  #close:hover{background:rgba(255,176,101,.95);color:#0b0d14}
+  #hint{position:fixed;left:26px;bottom:26px;z-index:20;font:11px/1.5 ui-monospace,monospace;
+        color:#8a8478;letter-spacing:.14em;text-transform:uppercase;pointer-events:none;mix-blend-mode:difference}
+  #hint b{color:#f2ede4}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="panel">
+  <button id="close">✕</button>
+  <div id="card" class="card">
+    <h2 id="ctitle">Projects</h2>
+    <p id="ctext">Selected work — case studies, process, results.</p>
+    <ul id="clist">
+      <li>Hand-coded project 01 — static sites &amp; performance audits</li>
+      <li>AI-assisted project 01 — generative design pipelines</li>
+      <li>CMS project 01 — content-first editorial system</li>
+      <li>Hand-coded project 02 — interactive data dashboards</li>
+      <li>AI-assisted project 02 — creative coding experiments</li>
+      <li>Benefuturo — co-creation platform for social impact</li>
+    </ul>
+  </div>
+</div>
+<div id="hint">drag · orbit &nbsp;•&nbsp; scroll · zoom &nbsp;•&nbsp; click a star to open a section</div>
+
+<script type="importmap">
+{ "imports": { "three": "./vendor/three.module.js", "three/addons/": "./vendor/addons/" } }
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from './vendor/addons/OrbitControls.js';
+
+/* ---------- reference images (textures) ---------- */
+const ASSETS = {
+  bg:  './reference_cartoon_images/best ones/cartoon-rocket-flying-space-planets-stars-background-orange-red-main-focus-image-scene-366762244.webp',
+  pl1: './reference_cartoon_images/best ones/cartoon-fantastic-planet-worlds-asteroid-set-cosmic-alien-space-element-game_33099-185.avif',
+  pl2: './reference_cartoon_images/others/cartoon-colorful-galaxy-background_52683-63413.avif',
+  st:  './reference_cartoon_images/others/cartoon-galaxy.jpg',
+};
+const loader = new THREE.TextureLoader();
+const T = {};
+await Promise.all(Object.entries(ASSETS).map(async ([k, url]) => {
+  T[k] = await new Promise((res, rej) => loader.load(url, res, undefined, rej));
+  T[k].colorSpace = THREE.SRGBColorSpace;
+  T[k].magFilter = THREE.LinearFilter;
+  T[k].minFilter = THREE.LinearMipmapLinearFilter;
+}));
+
+/* ---------- procedural paper textures ---------- */
+function noiseTex(base, speck = '#b8a480', amt = 0.10) {
+  const c = document.createElement('canvas'); c.width = 512; c.height = 512;
+  const x = c.getContext('2d');
+  x.fillStyle = base; x.fillRect(0, 0, 512, 512);
+  for (let i = 0; i < 4000; i++) {
+    x.fillStyle = Math.random() < 0.5 ? speck : '#efe4cf';
+    x.globalAlpha = Math.random() * amt;
+    x.fillRect(Math.random() * 512, Math.random() * 512, 2, 2);
+  }
+  x.globalAlpha = 1;
+  const t = new THREE.CanvasTexture(c);
+  t.colorSpace = THREE.SRGBColorSpace;
+  return t;
+}
+
+const TEX = {
+  kraft: noiseTex('#d9c7a5'),
+  kraftD: noiseTex('#b8a480', '#8f7a56', 0.14),
+  cream: noiseTex('#efe4cf', '#f7efe1', 0.06),
+  sky: new THREE.CanvasTexture((() => {
+    const c = document.createElement('canvas'); c.width = 512; c.height = 512;
+    const x = c.getContext('2d');
+    const g = x.createLinearGradient(0, 0, 0, 512);
+    g.addColorStop(0, '#1d283a'); g.addColorStop(1, '#0f131c');
+    x.fillStyle = g; x.fillRect(0, 0, 512, 512);
+    for (let i = 0; i < 700; i++) {
+      x.fillStyle = '#ffffff'; x.globalAlpha = Math.random() * 0.9;
+      x.beginPath(); x.arc(Math.random() * 512, Math.random() * 512, Math.random() * 1.6 + 0.4, 0, Math.PI * 2); x.fill();
+    }
+    x.globalAlpha = 1;
+    const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
+  })()),
+};
+
+const W = innerWidth, H = innerHeight;
+const renderer = new THREE.WebGLRenderer({canvas: document.getElementById('c'), antialias: true});
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setSize(W, H);
+renderer.setClearColor('#0b0d14');
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color('#0b0d14');
+scene.fog = new THREE.FogExp2('#0b0d14', 0.018);
+
+const camera = new THREE.PerspectiveCamera(45, W / H, 0.1, 120);
+camera.position.set(0, 0.4, 3.4);
+const target = new THREE.Vector3(0, 0, 0);
+camera.lookAt(target);
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.target.copy(target);
+controls.enableDamping = true;
+controls.dampingFactor = 0.05;
+controls.rotateSpeed = 0.5;
+controls.zoomSpeed = 0.8;
+controls.panSpeed = 0.5;
+controls.minDistance = 1.6;
+controls.maxDistance = 9;
+controls.maxPolarAngle = Math.PI * 0.68;
+controls.autoRotate = true;
+controls.autoRotateSpeed = 0.22;
+controls.update();
+
+/* ---------- lighting (warm key, soft fill) ---------- */
+const ambient = new THREE.AmbientLight('#f7efe1', 1.4); scene.add(ambient);
+const key = new THREE.PointLight('#ffb065', 16, 22, 2); key.position.set(-3, 3.2, 2.4); scene.add(key);
+const fill = new THREE.PointLight('#7fd3c4', 5, 18, 1.5); fill.position.set(2.6, 0.6, -2.8); scene.add(fill);
+const rim = new THREE.SpotLight('#f7efe1', 9, 26, Math.PI / 4, 0.45, 1); rim.position.set(0, 4.4, 1.0); rim.lookAt(0, 0, 0); scene.add(rim);
+
+/* ---------- cartoon star sprite ---------- */
+function starNode(pos, color, size = 0.28, label) {
+  const s = new THREE.Sprite(new THREE.SpriteMaterial({ color, transparent: true, opacity: 0.9 }));
+  s.position.set(...pos); s.scale.setScalar(size);
+  const g = new THREE.Group(); g.add(s); g.userData.pos = pos.slice(); g.userData.label = label;
+  return g;
+}
+
+const root = new THREE.Group();
+scene.add(root);
+
+/* ---------- backdrop universe (reference image) ---------- */
+const backSphere = new THREE.Mesh(
+  new THREE.SphereGeometry(42, 64, 32),
+  new THREE.MeshBasicMaterial({ map: T.bg, side: THREE.BackSide })
+);
+scene.add(backSphere);
+
+/* ---------- paper-craft box ---------- */
+const matKraft  = new THREE.MeshStandardMaterial({ map: TEX.kraft,  roughness: 1, metalness: 0, flatShading: true });
+const matKraftD = new THREE.MeshStandardMaterial({ map: TEX.kraftD, roughness: 1, metalness: 0, flatShading: true });
+const matCream  = new THREE.MeshStandardMaterial({ map: TEX.cream, roughness: 1, metalness: 0, flatShading: true });
+const matTeal   = new THREE.MeshStandardMaterial({ color: '#7fd3c4', roughness: 0.85, metalness: 0, flatShading: true });
+const matOrange = new THREE.MeshStandardMaterial({ color: '#ffb065', roughness: 0.85, metalness: 0, flatShading: true });
+
+const backWall = new THREE.Mesh(new THREE.PlaneGeometry(6.2, 4.2), matKraft); backWall.position.z = -2.72; root.add(backWall);
+const floor = new THREE.Mesh(new THREE.PlaneGeometry(7.4, 7.4), matKraftD); floor.rotation.x = -Math.PI / 2; floor.position.y = -2.1; root.add(floor);
+const ceil = new THREE.Mesh(new THREE.PlaneGeometry(7.4, 7.4), matCream); ceil.rotation.x = Math.PI / 2; ceil.position.y = 2.1; root.add(ceil);
+const lw = new THREE.Mesh(new THREE.PlaneGeometry(4.4, 4.4), matKraft); lw.rotation.y = Math.PI / 2; lw.position.set(-3.2, 0, 0); root.add(lw);
+const rw = new THREE.Mesh(new THREE.PlaneGeometry(4.4, 4.4), matKraft); rw.rotation.y = -Math.PI / 2; rw.position.set(3.2, 0, 0); root.add(rw);
+
+/* ---------- layered paper shelves ---------- */
+for (let i = 0; i < 4; i++) {
+  const r = 1.45 - i * 0.26;
+  const ring = new THREE.Mesh(new THREE.RingGeometry(r * 0.55, r, 32, 1, 0, Math.PI * 1.5), matCream);
+  ring.position.set(0, -0.45 + i * 0.34, -2.62 + i * 0.10);
+  ring.rotation.x = -0.22 + i * 0.06;
+  root.add(ring);
+}
+
+/* ---------- textured planets from references ---------- */
+function planet(pos, r, map, rings = false) {
+  const g = new THREE.SphereGeometry(r, 32, 24);
+  const m = new THREE.MeshStandardMaterial({ map, roughness: 0.7, metalness: 0, flatShading: true });
+  const p = new THREE.Mesh(g, m); p.position.set(...pos); root.add(p);
+  if (rings) {
+    const ring = new THREE.Mesh(new THREE.RingGeometry(r * 1.55, r * 2.15, 40),
+      new THREE.MeshBasicMaterial({ color: '#ffd4a6', side: THREE.DoubleSide, transparent: true, opacity: 0.5 }));
+    ring.rotation.x = Math.PI / 2 + 0.16; ring.position.copy(pos); root.add(ring);
+  }
+  return p;
+}
+
+planet([-1.9, -1.0, -1.75], 0.30, T.pl1, true);
+planet([1.3, -0.6, -1.6], 0.26, T.pl2);
+planet([-0.8, 0.65, -1.95], 0.17, TEX.kraft);
+planet([1.8, 1.05, -1.3], 0.14, TEX.cream);
+planet([0, -1.9, -1.7], 0.11, TEX.kraftD);
+
+/* ---------- soft clouds ---------- */
+function cloud(pos, s, color) {
+  const g = new THREE.Group();
+  for (let i = 0; i < 6; i++) {
+    const b = new THREE.Mesh(new THREE.SphereGeometry(0.3, 14, 14),
+      new THREE.MeshStandardMaterial({ color, roughness: 1, metalness: 0, flatShading: true }));
+    b.position.set(THREE.MathUtils.randFloat(-0.4, 0.4), THREE.MathUtils.randFloat(-0.35, 0.35), THREE.MathUtils.randFloat(-0.4, 0.4));
+    b.scale.setScalar(THREE.MathUtils.randFloat(0.7, 1.3)); g.add(b);
+  }
+  g.position.set(...pos); g.scale.setScalar(s); root.add(g); return g;
+}
+cloud([-2.2, -0.6, -1.9], 1.15, '#efe4cf');
+cloud([1.7, -0.4, -1.6], 1.35, '#efe4cf');
+cloud([-0.5, 1.0, -2.0], 0.9, '#d9c7a5');
+
+/* ---------- stars on back wall ---------- */
+const starPts = [];
+for (let i = 0; i < 120; i++) starPts.push(new THREE.Vector3(THREE.MathUtils.randFloatSpread(4.8), THREE.MathUtils.randFloat(-1.6, 1.8), -2.6));
+root.add(new THREE.Points(new THREE.BufferGeometry().setFromPoints(starPts),
+  new THREE.PointsMaterial({ color: '#ffd9a0', size: 0.05, transparent: true, opacity: 0.85 })));
+
+/* ---------- hanging sun ---------- */
+const sun = new THREE.Mesh(new THREE.SphereGeometry(0.2, 20, 16), new THREE.MeshBasicMaterial({ color: '#ffb065' }));
+sun.position.set(0, 1.55, -1.45); root.add(sun);
+const sunGlow = new THREE.Sprite(new THREE.SpriteMaterial({ color: '#ffb065', transparent: true, opacity: 0.5 }));
+sunGlow.position.copy(sun.position); sunGlow.scale.setScalar(3); root.add(sunGlow);
+
+/* ---------- clickable section stars ---------- */
+const SECTIONS = [
+  { label: 'Projects', pos: [-1.15, 0.55, -1.8], color: '#ffb065' },
+  { label: 'About',    pos: [ 1.15, 0.45, -1.9], color: '#7fd3c4' },
+  { label: 'FAQ',      pos: [-0.85, -0.35, -1.7], color: '#efe4cf' },
+  { label: 'Contact',  pos: [ 0.75, -0.55, -1.95], color: '#ffd9a0' },
+];
+const stars = [];
+SECTIONS.forEach((sec, i) => {
+  const n = starNode(sec.pos, sec.color, 0.30, sec.label);
+  n.position.z += i * 0.02;
+  root.add(n); stars.push(n);
+});
+
+/* ---------- overlay panel ---------- */
+const panel = document.getElementById('panel');
+const card  = document.getElementById('card');
+const ctitle= document.getElementById('ctitle');
+const ctext = document.getElementById('ctext');
+const clist = document.getElementById('clist');
+const close = document.getElementById('close');
+
+const COPY = {
+  Projects:['Selected work — case studies, process, results.',
+    ['Hand-coded project 01 — static sites & performance audits',
+     'AI-assisted project 01 — generative design pipelines',
+     'CMS project 01 — content-first editorial system',
+     'Hand-coded project 02 — interactive data dashboards',
+     'AI-assisted project 02 — creative coding experiments',
+     'Benefuturo — co-creation platform for social impact']],
+  About:['The studio, the method, the people behind it.',
+    ['A small co-creation lab based on paper, code & conversation',
+     'We build sites that load fast, read clear and stay online',
+     'No black-box build steps unless you ask for them',
+     'Hand-crafted, like the paper models in this scene']],
+  FAQ:['How we work, timelines, budgets, collaboration.',
+    ['Timeline: most sites ship in 2–6 weeks',
+     'Budget: day-rate or fixed project fee, agreed up front',
+     'Collaboration: Figma → code → static export, no lock-in',
+     'Hosting: Vercel static export, or wherever you prefer']],
+  Contact:['Start a project or just say hello.',
+    ['Email: hello@vyn.example',
+     'Form: contact page (coming next)',
+     'Office: by appointment, bring snacks']],
+};
+
+function openSection(label){
+  const c = COPY[label];
+  ctitle.textContent = label;
+  ctext.textContent = c[0];
+  clist.innerHTML = c[1].map(x => `<li>${x}</li>`).join('');
+  panel.classList.add('active');
+}
+function closePanel(){ panel.classList.remove('active'); }
+close.onclick = closePanel;
+panel.addEventListener('click', (e)=>{ if(e.target===panel) closePanel(); });
+
+/* ---------- interaction ---------- */
+const raycaster = new THREE.Raycaster();
+const pointer = new THREE.Vector2();
+let hoverLabel = null;
+renderer.domElement.style.cursor = 'grab';
+renderer.domElement.addEventListener('pointerdown', (e)=>{
+  if(panel.classList.contains('active')) return;
+  pointer.x = (e.clientX / W) * 2 - 1;
+  pointer.y = -(e.clientY / H) * 2 + 1;
+  raycaster.setFromCamera(pointer, camera);
+  const hits = raycaster.intersectObjects(stars, true);
+  for(const h of hits){
+    let o = h.object;
+    while(o && !o.userData.label) o = o.parent;
+    if(o?.userData.label){ openSection(o.userData.label); return; }
+  }
+});
+renderer.domElement.addEventListener('pointermove', (e)=>{
+  pointer.x = (e.clientX / W) * 2 - 1;
+  pointer.y = -(e.clientY / H) * 2 + 1;
+  raycaster.setFromCamera(pointer, camera);
+  const hits = raycaster.intersectObjects(stars, true);
+  let lab = null;
+  for(const h of hits){ let o=h.object; while(o && !o.userData.label) o=o.parent; if(o?.userData.label){lab=o.userData.label;break;} }
+  if(lab!==hoverLabel){
+    hoverLabel = lab;
+    renderer.domElement.style.cursor = lab ? 'pointer' : 'grab';
+    stars.forEach(s=>{ s.children[0].material.opacity = (s.userData.label===lab) ? 1 : 0.82; });
+  }
+});
+
+function resize(){
+  const w=innerWidth, h=innerHeight;
+  camera.aspect = w/h; camera.updateProjectionMatrix();
+  renderer.setSize(w,h);
+}
+addEventListener('resize', resize);
+resize();
+
+let t=0;
+renderer.setAnimationLoop(()=>{
+  t += 0.016;
+  stars.forEach((s,i)=>{
+    s.position.y = SECTIONS[i].pos[1] + Math.sin(t*1.2 + i)*0.04;
+    s.children[0].material.opacity = 0.82 + Math.sin(t*1.5+i)*0.08;
+  });
+  controls.update();
+  renderer.render(scene, camera);
+});
+</script>
+</body>
+</html>
