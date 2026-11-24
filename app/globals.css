@@ -242,10 +242,12 @@ body {
 @supports (animation-timeline: view()) and (animation-range: normal normal) {
   @media (prefers-reduced-motion: no-preference) {
     .px-scene {
+      /* Publishes the named view timeline for every px-* descendant. NOTE:
+       * no animation on this element — an animation here (even a no-op
+       * transform) would make .px-scene a STACKING CONTEXT, trapping the
+       * departure rocket's z-60 inside it so the later .hs-scene paints
+       * over the flame. view-timeline alone activates the timeline. */
       view-timeline: --pxscene block;
-      animation: px-empty linear both;
-      animation-timeline: --pxscene;
-      animation-range: cover;
     }
     /* Sky: full-roll range — the upward drift (to −16% by PIN 50) starts
      * from the scene peek (cover 0, PIN −38), so the sky is already alive
@@ -363,13 +365,6 @@ body {
   }
 }
 
-/* Empty animation: pins `view()` activation without mutating the scene. */
-@keyframes px-empty {
-  from,
-  to {
-    transform: none;
-  }
-}
 @keyframes px-bg {
   from {
     transform: translate3d(0, 0, 0);
