@@ -205,7 +205,7 @@ export function BackgroundLayer(): JSX.Element {
         })}
       </g>
       {/* moon — big crescent, top right (1281,127) */}
-      <g data-element="moon">
+      <g data-element="moon" transform="translate(0 130)">
         <path
           d="M 1281 127 a 70 70 0 1 0 24 96 a 58 58 0 1 1 -24 -96 Z"
           fill={PALE}
@@ -213,7 +213,7 @@ export function BackgroundLayer(): JSX.Element {
         />
       </g>
       {/* galaxyDashed — comet-drift galaxy (G5), upper left, tilted -14° */}
-      <g data-element="galaxyDashed" transform="translate(-39 60)">
+      <g data-element="galaxyDashed" transform="translate(-39 190)">
         <g transform="rotate(-14 194 200)">
           <ellipse
             cx="194"
@@ -270,7 +270,7 @@ export function BackgroundLayer(): JSX.Element {
       </g>
       {/* bigCircle — giant drafting circle + dashed axis, half hidden by the
        * mountains (drawn here in bg, so the mid ridge covers its base) */}
-      <g data-element="bigCircle">
+      <g data-element="bigCircle" transform="translate(0 90)">
         <circle cx="698" cy="380" r="302" fill="none" stroke={CIRCLE_LINE} strokeWidth="1.6" />
         <line
           x1="336"
